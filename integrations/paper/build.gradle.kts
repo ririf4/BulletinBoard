@@ -11,7 +11,7 @@ dependencies {
 	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-	implementation("net.rk4z:igf:1.0.1")
+	library("net.ririfa:igf:+")
 }
 
 paper {
