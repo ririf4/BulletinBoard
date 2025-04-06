@@ -11,6 +11,11 @@ allprojects {
 		implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:+")
 		implementation("com.h2database:h2:+")
 		implementation("net.ririfa:langman:+")
+		implementation("org.jetbrains.exposed:exposed-core:0.56.0")
+		implementation("org.jetbrains.exposed:exposed-dao:0.56.0")
+		implementation("org.jetbrains.exposed:exposed-jdbc:0.56.0")
+		implementation("org.jetbrains.exposed:exposed-json:0.56.0")
+		implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.56.0")
 	}
 }
 

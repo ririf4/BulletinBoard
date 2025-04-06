@@ -51,4 +51,8 @@ class DataBase(private val plugin: BulletinBoard) {
 	fun createRequiredTables() {
 
 	}
+
+	object Tables {
+
+	}
 }
