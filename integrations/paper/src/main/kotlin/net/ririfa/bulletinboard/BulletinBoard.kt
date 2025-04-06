@@ -8,7 +8,7 @@ import net.ririfa.bulletinboard.translation.BBMessageKey
 import net.ririfa.igf.IGF
 import net.ririfa.langman.InitType
 import net.ririfa.langman.LangMan
-import org.bukkit.NamespacedKey
+import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -17,23 +17,16 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 
 class BulletinBoard : JavaPlugin() {
 	companion object {
 		lateinit var instance: BulletinBoard
 			private set
-
 		val logger: Logger = LoggerFactory.getLogger(BulletinBoard::class.simpleName)
-
 		val availableLang = listOf("en", "ja")
-
-		private fun createKey(vararg name: String): NamespacedKey {
-			return IGF.createKey(*name)
-		}
-
-		object Keys {
-
-		}
+		val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
 	}
 
 	private val langDir = dataFolder.resolve("lang")

@@ -1,8 +1,11 @@
 package net.ririfa.bulletinboard.gui
 
-enum class GUIState {
+import net.ririfa.bulletinboard.translation.BBMessageKey
+
+enum class GUIState() {
     MAIN_BOARD,
+    NEW_POST,
     MY_POSTS,
-    POSTS,
+    ALL_POSTS,
 
 }
