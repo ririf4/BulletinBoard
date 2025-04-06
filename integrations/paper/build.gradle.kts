@@ -4,7 +4,7 @@ import net.minecrell.pluginyml.paper.PaperPluginDescription
 plugins {
 	id("net.minecrell.plugin-yml.paper") version "0.6.0"
 	id("xyz.jpenilla.run-paper") version "2.3.1"
-	id("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
+	id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
 }
 
 dependencies {
@@ -21,7 +21,7 @@ paper {
 	apiVersion = "1.21"
 	version = rootProject.version.toString()
 	name = rootProject.name
-	load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+	load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 	authors = listOf("RiriFa", "cotrin_d8")
 	description = "A simple bulletin board plugin"
 
