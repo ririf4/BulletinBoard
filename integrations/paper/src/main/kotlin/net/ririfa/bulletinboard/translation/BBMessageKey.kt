@@ -30,11 +30,30 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
         }
     }
 
-    sealed class DisplayPost : BBMessageKey() {
-        object TitleLabel : DisplayPost()
-        object ContentLabel : DisplayPost()
-        object AuthorLabel : DisplayPost()
-        object DateLabel : DisplayPost()
-        object Anonymous : DisplayPost()
+    sealed class Command : BBMessageKey() {
+        sealed class DisplayPost : Command() {
+            object TitleLabel : DisplayPost()
+            object ContentLabel : DisplayPost()
+            object AuthorLabel : DisplayPost()
+            object DateLabel : DisplayPost()
+            object Anonymous : DisplayPost()
+        }
+
+        sealed class Help : Command() {
+            object HelpHeader : Help()
+
+            object OpenBoard : Help()
+            object NewPost : Help()
+            object MyPosts : Help()
+            object AllPosts : Help()
+            object Settings : Help()
+            object DeletedPosts : Help()
+            object PreviewClose : Help()
+        }
+
+        sealed class Other : Command() {
+            object PlayerOnly : Other()
+            object UnknownCommand : Other()
+        }
     }
 }

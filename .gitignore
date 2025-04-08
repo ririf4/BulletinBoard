@@ -3,3 +3,6 @@ build
 .gradle
 */build
 */.gradle
+run
+.kotlin
+artifacts

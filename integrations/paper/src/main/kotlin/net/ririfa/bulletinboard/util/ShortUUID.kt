@@ -1,44 +1,50 @@
 package net.ririfa.bulletinboard.util
 
+import java.nio.ByteBuffer
 import java.util.*
 
 /**
- * A utility class for handling UUIDs and their shorter string representations.
- * This class provides methods to generate, convert, and validate UUIDs and their short string forms.
+ * Utility class for handling UUIDs and their shorter string representations.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class ShortUUID private constructor(
-    private val uuid: UUID?,
-    private val shortString: String?
+class ShortUUID internal constructor(
+    val uuid: UUID
 ) : Comparable<ShortUUID> {
-
     companion object {
         /**
-         * Generates a new ShortUUID with a random UUID.
+         * Creates a random ShortUUID.
+         * It contains a random UUID.
          * @return A new ShortUUID instance.
          */
-        fun randomUUID(): ShortUUID {
-            val uuid = UUID.randomUUID()
-            val shortUUID = ShortUUID(uuid, null).toShortString()
-            return ShortUUID(uuid, shortUUID)
-        }
+        fun generate(): ShortUUID = ShortUUID(UUID.randomUUID())
 
         /**
          * Creates a ShortUUID from a standard UUID string.
-         * @param uuid The UUID string.
+         * @param uuidString The UUID string.
          * @return A new ShortUUID instance.
          */
-        fun fromString(uuid: String): ShortUUID {
-            return ShortUUID(UUID.fromString(uuid), null)
-        }
+        fun fromUUID(uuidString: String): ShortUUID = ShortUUID(UUID.fromString(uuidString))
+
+        /**
+         * Creates a ShortUUID from a UUID.
+         * @param uuid The UUID.
+         * @return A new ShortUUID instance.
+         */
+        fun fromUUID(uuid: UUID): ShortUUID = ShortUUID(uuid)
 
         /**
          * Creates a ShortUUID from a short string representation.
          * @param shortString The short string representation of the UUID.
          * @return A new ShortUUID instance.
+         * @throws IllegalArgumentException if the short string is invalid.
          */
         fun fromShortString(shortString: String): ShortUUID {
-            return ShortUUID(null, shortString)
+            require(isValidShortString(shortString)) { "Invalid short string for UUID" }
+            val bytes = Base64.getUrlDecoder().decode(shortString)
+            val bb = ByteBuffer.wrap(bytes)
+            val high = bb.long
+            val low = bb.long
+            return ShortUUID(UUID(high, low))
         }
 
         /**
@@ -46,121 +52,62 @@ class ShortUUID private constructor(
          * @param shortString The short string to validate.
          * @return True if the short string is valid, false otherwise.
          */
-        fun isValidShortString(shortString: String): Boolean {
-            return try {
-                val bytes = Base64.getUrlDecoder().decode(shortString)
-                bytes.size == 16
-            } catch (e: IllegalArgumentException) {
-                false
-            }
-        }
-
-        /**
-         * Creates a ShortUUID from a byte array.
-         * @param byteArray The byte array representing the UUID.
-         * @return A new ShortUUID instance.
-         */
-        fun fromByteArray(byteArray: ByteArray): ShortUUID {
-            val bb = java.nio.ByteBuffer.wrap(byteArray)
-            val high = bb.long
-            val low = bb.long
-            return ShortUUID(UUID(high, low))
-        }
-
-        /**
-         * Creates a ShortUUID from various types of input.
-         * @param value The input value, which can be a String, UUID, or ShortUUID.
-         * @return A new ShortUUID instance or null if the input type is not supported.
-         */
-        fun fromAny(value: Any): ShortUUID? {
-            return when (value) {
-                is String -> if (isValidShortString(value)) fromShortString(value) else fromString(value)
-                is UUID -> ShortUUID(value, null)
-                is ShortUUID -> value
-                else -> null
-            }
+        fun isValidShortString(shortString: String): Boolean = try {
+            Base64.getUrlDecoder().decode(shortString).size == 16
+        } catch (e: IllegalArgumentException) {
+            false
         }
     }
 
-    private constructor(uuid: UUID) : this(uuid, null)
-
     /**
-     * Converts the ShortUUID to a standard UUID.
-     * @return The UUID or null if conversion is not possible.
+     * Converts the UUID to a standard string representation.
+     * @return The standard UUID string.
      */
-    fun toUUID(): UUID? {
-        if (uuid != null) {
-            return uuid
-        }
-        return shortString?.let {
-            val bytes = Base64.getUrlDecoder().decode(it)
-            val bb = java.nio.ByteBuffer.wrap(bytes)
-            val high = bb.long
-            val low = bb.long
-            return UUID(high, low)
-        }
-    }
+    fun toUUIDString(): String = uuid.toString()
 
     /**
-     * Converts the ShortUUID to its short string representation.
+     * Converts the UUID to a short string representation.
      * @return The short string representation of the UUID.
      */
     fun toShortString(): String {
-        if (shortString != null) {
-            return shortString
-        }
-        val bb = java.nio.ByteBuffer.wrap(ByteArray(16))
-        bb.putLong(uuid!!.mostSignificantBits)
+        val bb = ByteBuffer.wrap(ByteArray(16))
+        bb.putLong(uuid.mostSignificantBits)
         bb.putLong(uuid.leastSignificantBits)
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bb.array())
     }
 
     /**
-     * Converts the ShortUUID to a byte array.
+     * Converts the UUID to a byte array.
      * @return The byte array representation of the UUID.
      */
     fun toByteArray(): ByteArray {
-        val bb = java.nio.ByteBuffer.wrap(ByteArray(16))
-        bb.putLong(uuid!!.mostSignificantBits)
+        val bb = ByteBuffer.wrap(ByteArray(16))
+        bb.putLong(uuid.mostSignificantBits)
         bb.putLong(uuid.leastSignificantBits)
         return bb.array()
     }
 
-    /**
-     * Returns the string representation of the ShortUUID.
-     * @return The string representation of the UUID or short string.
-     */
-    override fun toString(): String {
-        return uuid?.toString() ?: shortString ?: ""
-    }
+    override fun toString(): String = toShortString()
 
-    /**
-     * Checks if this ShortUUID is equal to another object.
-     * @param other The object to compare with.
-     * @return True if the objects are equal, false otherwise.
-     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ShortUUID) return false
-
-        return this.toUUID() == other.toUUID()
+        return uuid == other.uuid
     }
 
-    /**
-     * Returns the hash code of the ShortUUID.
-     * @return The hash code.
-     */
-    override fun hashCode(): Int {
-        return toUUID()?.hashCode() ?: shortString.hashCode()
-    }
+    override fun hashCode(): Int = uuid.hashCode()
 
-    /**
-     * Compares this ShortUUID with another ShortUUID.
-     * @param other The other ShortUUID to compare with.
-     * @return A negative integer, zero, or a positive integer as this ShortUUID is less than,
-     * equal to, or greater than the specified ShortUUID.
-     */
-    override fun compareTo(other: ShortUUID): Int {
-        return this.toUUID()?.compareTo(other.toUUID()) ?: 0
-    }
+    override fun compareTo(other: ShortUUID): Int = uuid.compareTo(other.uuid)
 }
+
+/**
+ * Converts a UUID to a ShortUUID.
+ * @return The ShortUUID representation of the UUID.
+ */
+fun UUID.toShortUUID(): ShortUUID = ShortUUID(this)
+
+/**
+ * Converts a ShortUUID to a UUID.
+ * @return The UUID representation of the ShortUUID.
+ */
+fun ShortUUID.toUUID(): UUID = UUID.fromString(toUUIDString())
