@@ -5,6 +5,7 @@ package net.ririfa.bulletinboard
 import com.google.gson.Gson
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.ririfa.beacon.EventBus
 import net.ririfa.bulletinboard.command.CommandManager
 import net.ririfa.bulletinboard.translation.BBMSGProvider
 import net.ririfa.bulletinboard.translation.BBMessageKey
@@ -55,6 +56,7 @@ class BulletinBoard : JavaPlugin() {
 
 		langMan.init(InitType.YAML, langDir, availableLang)
 		IGF.init(this, "net.ririfa.bulletinboard")
+		EventBus.initialize("net.ririfa.bulletinboard")
 		dataBase = DataBase(this)
 		dataBase.start()
 	}

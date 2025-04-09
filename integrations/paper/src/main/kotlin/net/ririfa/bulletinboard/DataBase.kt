@@ -3,69 +3,46 @@
 package net.ririfa.bulletinboard
 
 import net.kyori.adventure.text.Component
+import net.ririfa.beacon.IEventHandler
 import net.ririfa.bulletinboard.BulletinBoard.Companion.logger
-import net.ririfa.bulletinboard.util.Post
-import net.ririfa.bulletinboard.util.ShortUUID
+import net.ririfa.bulletinboard.util.*
 import org.apache.commons.lang3.time.DateUtils.parseDate
 import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
 import java.util.*
 
-class DataBase(private val plugin: BulletinBoard) {
-	private var connection: Connection? = null
-		get() {
-			if (field == null || field!!.isClosed) {
-				throw SQLException("Connection is not open.")
-			}
-			return field
-		}
-	private var memoryConnection: Connection? = null
-		get() {
-			if (field == null || field!!.isClosed) {
-				throw SQLException("Connection is not open.")
-			}
-			return field
-		}
+class DataBase(private val plugin: BulletinBoard) : IEventHandler {
+	lateinit var db: Database
+	lateinit var memDb: Database
 
 	fun start(): Boolean {
 		return try {
 			val fileDbUrl = "jdbc:h2:${plugin.dataFolder}/database.db;MODE=SQLite;AUTO_SERVER=TRUE"
 			val memoryDbUrl = "jdbc:h2:mem:bulletinboard;MODE=SQLite;DB_CLOSE_DELAY=-1"
 
-			connection = DriverManager.getConnection(fileDbUrl, "sa", "")
-			memoryConnection = DriverManager.getConnection(memoryDbUrl, "sa", "")
+			db = Database.connect(fileDbUrl, driver = "org.h2.Driver", user = "sa", password = "")
+			memDb = Database.connect(memoryDbUrl, driver = "org.h2.Driver", user = "sa", password = "")
 
 			logger.info("H2 (Persistent + In-Memory) started successfully!")
 			true
-		} catch (e: SQLException) {
+		} catch (e: Exception) {
 			logger.error("Failed to start H2 database: ${e.message}")
 			false
 		}
 	}
 
-	fun stop() {
-		try {
-			memoryConnection?.close()
-			connection?.close()
-			logger.info("H2 database connections closed.")
-		} catch (e: SQLException) {
-			logger.error("Failed to close H2 database: ${e.message}")
-		}
-	}
-
+	@Suppress("RemoveRedundantQualifierName")
 	object Accessor {
-		fun getAllPosts(): List<Post> = transaction {
+		fun getAllPosts(): List<Post> = DB {
 			Tables.Posts
 				.selectAll()
 				.where { Tables.Posts.isDeleted eq false }
 				.map(::toPost)
 		}
 
-		fun getMyPosts(player: Player): List<Post> = transaction {
+		fun getMyPosts(player: Player): List<Post> = DB {
 			Tables.Posts
 				.selectAll()
 				.where {
@@ -74,7 +51,7 @@ class DataBase(private val plugin: BulletinBoard) {
 				.map(::toPost)
 		}
 
-		fun getDeletedPosts(player: Player): List<Post> = transaction {
+		fun getDeletedPosts(player: Player): List<Post> = DB {
 			Tables.Posts
 				.selectAll()
 				.where {
@@ -82,6 +59,54 @@ class DataBase(private val plugin: BulletinBoard) {
 				}
 				.map(::toPost)
 		}
+
+		fun insertPost(post: Post) {
+			DB {
+				Tables.Posts.insert {
+					it[id] = post.id.toShortString()
+					it[author] = post.author.toString()
+					it[title] = post.title.content()
+					it[content] = post.content.content()
+					it[isAnonymous] = post.isAnonymous
+					it[date] = DateFormatUtil.format(post.date)
+					it[isDeleted] = post.isDeleted
+				}
+			}
+			DiffTracker.markChanged(Tables.Posts)
+		}
+
+		fun updatePost(post: Post) {
+			DB {
+				Tables.Posts.update({ Tables.Posts.id eq post.id.toShortString() }) {
+					it[title] = post.title.content()
+					it[content] = post.content.content()
+					it[isAnonymous] = post.isAnonymous
+					it[date] = DateFormatUtil.format(post.date)
+					it[isDeleted] = post.isDeleted
+				}
+			}
+			DiffTracker.markChanged(Tables.Posts)
+		}
+
+		fun deletePost(post: Post) {
+			DB {
+				Tables.Posts
+					.update({ Tables.Posts.id eq post.id.toShortString() }) {
+						it[isDeleted] = true
+					}
+			}
+			DiffTracker.markChanged(Tables.Posts)
+		}
+
+		fun deletePostPermanently(post: Post) {
+			DB {
+
+				Tables.Posts
+					.deleteWhere { Tables.Posts.id eq post.id.toShortString() }
+			}
+			DiffTracker.markChanged(Tables.Posts)
+		}
+
 
 		internal fun toPost(row: ResultRow): Post = Post(
 			id = ShortUUID.fromShortString(row[Tables.Posts.id]),
@@ -102,7 +127,14 @@ class DataBase(private val plugin: BulletinBoard) {
 		logger.info("All required tables created!")
 	}
 
+	override fun initHandlers() {
+//		handler<DBTransactionEvent> { event ->
+//
+//		}
+	}
 
+
+	@Suppress("ExposedReference")
 	object Tables {
 		object Posts : Table("posts") {
 			val id = text("id")
