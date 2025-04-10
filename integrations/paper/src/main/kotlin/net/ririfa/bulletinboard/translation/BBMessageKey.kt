@@ -18,10 +18,41 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
                 object Help : MainBoard()
             }
 
+            sealed class MyPosts : BBMessageKey() {
+                object EditPost : MyPosts()
+                object DeletePost : MyPosts()
+            }
+
+            sealed class AllPosts : BBMessageKey() {
+                object DeleteOthers : BBMessageKey()
+            }
+
+            sealed class DeletedPosts : BBMessageKey() {
+                object RestorePost : DeletedPosts()
+                object DeletePostPermanently : DeletedPosts()
+            }
+
             sealed class Paged : Buttons() {
                 object Next : Paged()
                 object Previous : Paged()
             }
+        }
+
+        sealed class Messages : GUI() {
+            object EnterTitle : Messages()
+            object EnterContent : Messages()
+
+            object EnterTitleEdit : Messages()
+            object EnterContentEdit : Messages()
+        }
+
+        sealed class Editor : GUI() {
+            object NoTitle : Editor()
+            object NoContent : Editor()
+            object Save : Editor()
+            object Cancel : Editor()
+
+            object EditError : Editor()
         }
 
         sealed class Other : GUI() {

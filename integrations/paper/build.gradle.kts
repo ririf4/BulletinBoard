@@ -11,7 +11,7 @@ dependencies {
 	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-	library("net.ririfa:igf:1.5.4")
+	library("net.ririfa:igf:1.5.5-SNAPSHOT")
 }
 
 paper {
