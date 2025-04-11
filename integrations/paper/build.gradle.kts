@@ -2,7 +2,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
-	id("net.minecrell.plugin-yml.paper") version "0.6.0"
+	id("de.eldoria.plugin-yml.paper") version "0.7.1"
 	id("xyz.jpenilla.run-paper") version "2.3.1"
 	id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
 }
@@ -11,11 +11,14 @@ dependencies {
 	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-	library("net.ririfa:igf:1.5.5-SNAPSHOT")
+	paperLibrary("net.ririfa:igf:1.5.5-20250411.124811-4")
+	paperLibrary(kotlin("stdlib"))
+	paperLibrary(kotlin("reflect"))
 }
 
 paper {
 	main = "net.ririfa.bulletinboard.BulletinBoard"
+	loader = "net.ririfa.bulletinboard.loader.FabricordPluginLoader"
 	generateLibrariesJson = true
 	foliaSupported = false
 	apiVersion = "1.21"
@@ -26,11 +29,6 @@ paper {
 	description = "A simple bulletin board plugin"
 
 	serverDependencies {
-		register("Kotlin") {
-			required = true
-			load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-		}
-
 		register("LuckPerms") {
 			required = false
 			load = PaperPluginDescription.RelativeLoadOrder.BEFORE
@@ -128,9 +126,16 @@ paper {
 tasks.named<Jar>("jar") {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	from(sourceSets.main.get().output)
+//	from("LICENSE") {
+//		rename { "${it}_${project.name}" }
+//	}
 	from({
-		configurations.runtimeClasspath.get().map { file ->
-			if (file.isDirectory) file else { zipTree(file) }
-		}
+		configurations.runtimeClasspath.get()
+			.filter { file ->
+				!file.name.startsWith("kotlin")
+			}
+			.map { file ->
+				if (file.isDirectory) file else zipTree(file)
+			}
 	})
 }

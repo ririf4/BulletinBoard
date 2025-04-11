@@ -1,0 +1,70 @@
+GUI:
+  Title: "BulletinBoard %version%"
+
+  Buttons:
+    MainBoard:
+      NewPost: "New Post"
+      AllPosts: "All Posts"
+      MyPosts: "My Posts"
+      DeletedPosts: "Deleted Posts"
+      AboutPlugin: "About This Plugin"
+      Settings: "Settings"
+      Help: "Help"
+
+    MyPosts:
+      EditPost: "Edit Post"
+      DeletePost: "Delete Post"
+
+    AllPosts:
+      DeleteOthers: "Delete Other Users' Posts"
+
+    DeletedPosts:
+      RestorePost: "Restore Post"
+      DeletePostPermanently: "Delete Post Permanently"
+
+    Paged:
+      Next: "Next Page"
+      Previous: "Previous Page"
+
+  Messages:
+    EnterTitle: "Please enter the title of the post:"
+    EnterContent: "Please enter the content of the post:"
+    EnterTitleEdit: "Please enter the new title of the post:"
+    EnterContentEdit: "Please enter the new content of the post:"
+
+  Editor:
+    NoTitle: "No title..."
+    NoContent: "No content..."
+    Save: "Save Post"
+    Cancel: "Cancel Post"
+    SaveEdit: "Save Edit"
+    EditError: "Edit Error: %reason%"
+
+    EditErrorReason:
+      DraftNull: "No edit draft data found. Please try again."
+
+  Other:
+    NoPosts: "Looks like there's nothing here..."
+    UnknownPlayer: "Unknown Player"
+
+Command:
+  DisplayPost:
+    TitleLabel: "Title: %title%"
+    ContentLabel: "Content: %content%"
+    AuthorLabel: "Author: %author%"
+    DateLabel: "Date: %date%"
+    Anonymous: "Anonymous"
+
+  Help:
+    HelpHeader: "BulletinBoard Command List"
+    OpenBoard: "Open the main board"
+    NewPost: "Create a new post"
+    MyPosts: "Show your own posts"
+    AllPosts: "Show all posts"
+    Settings: "Open settings"
+    DeletedPosts: "Show deleted posts"
+    PreviewClose: "Close post preview"
+
+  Other:
+    PlayerOnly: "This command can only be used by players."
+    UnknownCommand: "Unknown command. Use /%command% to display the help."

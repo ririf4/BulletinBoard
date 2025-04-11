@@ -38,9 +38,15 @@ object CommandManager : CommandExecutor, TabCompleter {
         } else {
             if (sender is Player) {
                 val p = sender.adapt()
-                sender.sendMessage(p.getMessage(BBMessageKey.Command.Other.UnknownCommand, Commands.HELP.name))
+                val ca = mapOf(
+                    "command" to "bb ${Commands.HELP.name}"
+                )
+                sender.sendMessage(p.getMessage(BBMessageKey.Command.Other.UnknownCommand, ca))
             } else {
-                sender.sendMessage(LM.getMessage(BBMessageKey.Command.Other.UnknownCommand, Commands.HELP.name))
+                val ca = mapOf(
+                    "command" to "bb ${Commands.HELP.name}"
+                )
+                sender.sendMessage(LM.getMessage(BBMessageKey.Command.Other.UnknownCommand, ca))
             }
             return true
         }

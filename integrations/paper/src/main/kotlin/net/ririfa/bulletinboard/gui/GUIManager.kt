@@ -1,58 +1,26 @@
 package net.ririfa.bulletinboard.gui
 
 import net.ririfa.bulletinboard.DataBase
+import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.gui.GUIState.*
 import net.ririfa.bulletinboard.translation.BBMessageKey.GUI
 import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
-import net.ririfa.igf.Button
-import net.ririfa.igf.PaginatedDynamicGUI
-import net.ririfa.igf.setClick
-import net.ririfa.igf.setClickTyped
+import net.ririfa.igf.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
 object GUIManager {
     fun openGUI(player: Player, openState: GUIState = MAIN_BOARD) {
+        if (openState == MAIN_BOARD) {
+            openMain(player)
+            return
+        }
+
         val ap = player.adapt()
         val middleRowSlots = listOf(10, 12, 14, 16)
 
         val fixedButtonProvider = mapOf<GUIState, (GUIState) -> List<Button>>(
-            MAIN_BOARD to { state ->
-                listOf(
-                    Button(10, Material.WRITABLE_BOOK, GUI.Buttons.MainBoard.NewPost.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.switchState(NEW_POST)
-                        },
-                    Button(12, Material.BOOK, GUI.Buttons.MainBoard.AllPosts.t(ap))
-                    .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                        gui.switchState(ALL_POSTS)
-                    },
-                    Button(14, Material.WRITTEN_BOOK, GUI.Buttons.MainBoard.MyPosts.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.switchState(MY_POSTS)
-                        },
-                    Button(16, Material.CAULDRON, GUI.Buttons.MainBoard.DeletedPosts.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.switchState(DELETED_POSTS)
-                        },
-                    Button(29, Material.LECTERN, GUI.Buttons.MainBoard.AboutPlugin.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.close()
-                            displayAbout(player)
-                        },
-                    Button(31, Material.COMPARATOR, GUI.Buttons.MainBoard.Settings.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.switchState(SETTINGS)
-                        },
-                    Button(33, Material.OAK_SIGN, GUI.Buttons.MainBoard.Help.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            gui.close()
-                            displayHelp(player)
-                        }
-                )
-            },
-
             NEW_POST to { state ->
                 val playerState = player.getPlayerState()
                 val draft = playerState.draftState.draft ?: PostDraft(
@@ -84,7 +52,7 @@ object GUIManager {
                     Button(19, Material.RED_WOOL, GUI.Editor.Cancel.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             playerState.clearDraft()
-                            gui.switchState(MAIN_BOARD)
+                            gui.switchState(CONFIRM_CANCEL_POST)
                         },
 
                     Button(25, Material.GREEN_WOOL, GUI.Editor.Save.t(ap))
@@ -99,8 +67,11 @@ object GUIManager {
                 val draft = playerState.draftState.editDraft
 
                 if (draft == null) {
+                    val ac = mapOf(
+                        "reason" to ap.getMessage(GUI.Editor.EditErrorReason.DraftNull)
+                    )
                     return@to listOf(
-                        Button(13, Material.BARRIER, GUI.Editor.EditError.t(ap))
+                        Button(13, Material.BARRIER, ap.getMessage(GUI.Editor.EditError, ac))
                     )
                 }
 
@@ -121,19 +92,18 @@ object GUIManager {
                             player.sendMessage(ap.getMessage(GUI.Messages.EnterContentEdit))
                         },
 
-                    Button(19, Material.RED_WOOL, GUI.Editor.Cancel.t(ap))
+                    Button(19, Material.RED_WOOL, GUI.Editor.CancelEdit.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             playerState.draftState.editDraft = null
                             gui.switchState(MY_POSTS)
                         },
 
-                    Button(25, Material.GREEN_WOOL, GUI.Editor.Save.t(ap))
+                    Button(25, Material.GREEN_WOOL, GUI.Editor.SaveEdit.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.switchState(CONFIRM_SAVE_EDIT)
                         }
                 )
             },
-
 
             MY_POSTS to { state ->
                 listOf(
@@ -173,6 +143,12 @@ object GUIManager {
                             gui.switchState(DELETE_POST_PERMANENTLY_SELECTION)
                         }
                 )
+            },
+
+            CONFIRM_CANCEL_POST to { state ->
+                listOf(
+
+                )
             }
         )
 
@@ -190,9 +166,19 @@ object GUIManager {
         )
 
         val noPosts = Button(13, Material.PAPER, ap.getMessage(GUI.Other.NoPosts))
+        val paginationEnableState = setOf(
+            ALL_POSTS,
+            MY_POSTS,
+            DELETED_POSTS
+        )
+
+        val titleAc = mapOf(
+            "version" to Plugin.version
+        )
 
         val gui = PaginatedDynamicGUI.of<GUIState>(player)
             .setStateFixedButtonProviders(fixedButtonProvider)
+            .setPaginationEnabledStates(paginationEnableState)
             .setSlotPositions(middleRowSlots)
             .setPageItemProvider { state -> resolvePageButtons(state, player, middleRowSlots) }
             .setItemsPerPage(middleRowSlots.size)
@@ -202,7 +188,65 @@ object GUIManager {
             // End of the PaginatedGUI configuration
             .setSize(27)
             // PaginatedDynamicGUI isn't changing Inventory. so we can't change the title for each state
-            .setTitle(ap.getMessage(GUI.Title))
+            .setTitle(ap.getMessage(GUI.Title, titleAc))
+            .setBackground(Material.GRAY_STAINED_GLASS_PANE)
+            .build()
+
+        gui.open()
+    }
+
+    private fun openMain(player: Player) {
+        val titleAc = mapOf(
+            "version" to Plugin.version
+        )
+        val ap = player.adapt()
+        val fixedButtonProvider = mapOf<SinglePage, (SinglePage) -> List<Button>>(
+            SinglePage.PAGE to { state ->
+                listOf(
+                    Button(10, Material.WRITABLE_BOOK, GUI.Buttons.MainBoard.NewPost.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
+                            gui.close()
+                            openGUI(player, NEW_POST)
+                        },
+                    Button(12, Material.BOOK, GUI.Buttons.MainBoard.AllPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, ALL_POSTS)
+                        },
+                    Button(14, Material.WRITTEN_BOOK, GUI.Buttons.MainBoard.MyPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, MY_POSTS)
+                        },
+                    Button(16, Material.CAULDRON, GUI.Buttons.MainBoard.DeletedPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, DELETED_POSTS)
+                        },
+                    Button(29, Material.LECTERN, GUI.Buttons.MainBoard.AboutPlugin.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            displayAbout(player)
+                        },
+                    Button(31, Material.COMPARATOR, GUI.Buttons.MainBoard.Settings.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, SETTINGS)
+                        },
+                    Button(33, Material.OAK_SIGN, GUI.Buttons.MainBoard.Help.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            displayHelp(player)
+                        }
+                )
+            }
+        )
+
+        val gui = PaginatedDynamicGUI.of<SinglePage>(player)
+            .setStateFixedButtonProviders(fixedButtonProvider)
+            .setState(SinglePage.PAGE)
+            .setTitle(ap.getMessage(GUI.Title, titleAc))
+            .setSize(45)
             .setBackground(Material.GRAY_STAINED_GLASS_PANE)
             .build()
 
@@ -215,7 +259,7 @@ object GUIManager {
         middleRowSlots: List<Int>
     ): List<Button> {
         return when (state) {
-            MAIN_BOARD, NEW_POST, SETTINGS -> emptyList()
+            MAIN_BOARD, NEW_POST, SETTINGS, CONFIRM_CANCEL_POST, CONFIRM_SAVE_EDIT, EDIT_POST, CONFIRM_SAVE_POST -> emptyList()
             MY_POSTS -> {
                 DataBase.Accessor.getMyPosts(player)
                     .mapIndexedNotNull { index, post ->
@@ -269,9 +313,6 @@ object GUIManager {
             DELETE_POST_OTHERS_SELECTION -> TODO()
             RESTORE_POST_SELECTION -> TODO()
             DELETE_POST_PERMANENTLY_SELECTION -> TODO()
-            CONFIRM_SAVE_POST -> TODO()
-            EDIT_POST -> TODO()
-            CONFIRM_SAVE_EDIT -> TODO()
         }
     }
 }

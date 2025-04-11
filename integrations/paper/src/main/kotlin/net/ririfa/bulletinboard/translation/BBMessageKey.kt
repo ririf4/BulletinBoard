@@ -51,13 +51,19 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
             object NoContent : Editor()
             object Save : Editor()
             object Cancel : Editor()
+            object SaveEdit : Editor()
+            object CancelEdit : Editor()
 
             object EditError : Editor()
+
+            sealed class EditErrorReason : Editor() {
+                object DraftNull : EditErrorReason()
+            }
         }
 
         sealed class Other : GUI() {
             object NoPosts : Other()
-           object UnknownPlayer : Other()
+            object UnknownPlayer : Other()
         }
     }
 

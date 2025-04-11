@@ -1,6 +1,7 @@
 package net.ririfa.bulletinboard.command
 
 import net.kyori.adventure.text.Component
+import net.ririfa.bulletinboard.DataBase
 import net.ririfa.bulletinboard.gui.GUIManager.openGUI
 import net.ririfa.bulletinboard.gui.GUIState
 import net.ririfa.bulletinboard.util.Post
@@ -8,13 +9,12 @@ import net.ririfa.bulletinboard.util.ShortUUID
 import net.ririfa.bulletinboard.util.displayAbout
 import net.ririfa.bulletinboard.util.displayHelp
 import org.bukkit.entity.Player
-
 import java.util.*
 
 typealias CommandExecute = (Player, Array<String>) -> Unit
 
 enum class Commands(val execute: CommandExecute) {
-    OPENBOARD({ player, _ -> openGUI(player, GUIState.MAIN_BOARD) }),
+    OPENBOARD({ player, _ -> openGUI(player) }),
     NEWPOST({ player, _ -> openGUI(player, GUIState.NEW_POST) }),
     ALLPOSTS({ player, _ -> openGUI(player, GUIState.ALL_POSTS) }),
     MYPOSTS({ player, _ -> openGUI(player, GUIState.MY_POSTS) }),
@@ -34,7 +34,6 @@ enum class Commands(val execute: CommandExecute) {
     HELP({ player, _ -> displayHelp(player) }),
     ABOUT({ player, _ -> displayAbout(player) }),
 
-    // TODO
     DEBUG({ player, _ -> /*player.getPlayerState().sendDebugMessage(player)*/ }),
     INSERTDEBUGPOST({ player, args ->
         if (player.hasPermission("bulletinboard.post.debug")) {
@@ -50,8 +49,7 @@ enum class Commands(val execute: CommandExecute) {
                     date = Date(),
                     isDeleted = false
                 )
-                //TODO
-                //BulletinBoard.dataBase.insertPost(post)
+                DataBase.Accessor.insertPost(post)
                 player.sendMessage("Debug post inserted with isAnonymous set to $isAnonymous")
             } else {
                 player.sendMessage("Usage: /insertdebugpost <0 or 1>")

@@ -163,3 +163,18 @@ fun displayHelp(player: Player) {
     }
     player.sendMessage(Component.text("=======================").color(NamedTextColor.GOLD))
 }
+
+fun Component.content(): String {
+    return PlainTextComponentSerializer.plainText().serialize(this)
+}
+
+fun isOlderVersion(current: String, latest: String): Boolean {
+    val currentParts = current.split(".").map { it.toIntOrNull() ?: 0 }
+    val latestParts = latest.split(".").map { it.toIntOrNull() ?: 0 }
+
+    val maxLength = maxOf(currentParts.size, latestParts.size)
+    val paddedCurrent = currentParts + List(maxLength - currentParts.size) { 0 }
+    val paddedLatest = latestParts + List(maxLength - latestParts.size) { 0 }
+
+    return (0 until maxLength).any { paddedCurrent[it] < paddedLatest[it] }
+}
