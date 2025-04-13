@@ -18,16 +18,16 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
                 object Help : MainBoard()
             }
 
-            sealed class MyPosts : BBMessageKey() {
+            sealed class MyPosts : Buttons() {
                 object EditPost : MyPosts()
                 object DeletePost : MyPosts()
             }
 
-            sealed class AllPosts : BBMessageKey() {
+            sealed class AllPosts : Buttons() {
                 object DeleteOthers : BBMessageKey()
             }
 
-            sealed class DeletedPosts : BBMessageKey() {
+            sealed class DeletedPosts : Buttons() {
                 object RestorePost : DeletedPosts()
                 object DeletePostPermanently : DeletedPosts()
             }

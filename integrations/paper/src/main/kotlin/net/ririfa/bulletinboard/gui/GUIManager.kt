@@ -9,6 +9,7 @@ import net.ririfa.bulletinboard.util.*
 import net.ririfa.igf.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
 
 object GUIManager {
     fun openGUI(player: Player, openState: GUIState = MAIN_BOARD) {
@@ -184,6 +185,9 @@ object GUIManager {
             .setItemsPerPage(middleRowSlots.size)
             .setEmptyMessageButton(noPosts)
             .setPageChangeButtons(pageChangeButton.first, pageChangeButton.second)
+            .onClose { _, reason ->
+                if (reason == InventoryCloseEvent.Reason.PLAYER) player.getPlayerState().clearAll()
+            }
             .setState(openState)
             // End of the PaginatedGUI configuration
             .setSize(27)
@@ -244,6 +248,10 @@ object GUIManager {
 
         val gui = PaginatedDynamicGUI.of<SinglePage>(player)
             .setStateFixedButtonProviders(fixedButtonProvider)
+            .onClose { _, reason ->
+                // If player closes gui, all state will clear
+                if (reason == InventoryCloseEvent.Reason.PLAYER) player.getPlayerState().clearAll()
+            }
             .setState(SinglePage.PAGE)
             .setTitle(ap.getMessage(GUI.Title, titleAc))
             .setSize(45)

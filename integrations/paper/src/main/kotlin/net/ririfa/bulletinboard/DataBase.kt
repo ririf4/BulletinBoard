@@ -27,14 +27,22 @@ class DataBase(private val plugin: BulletinBoard) {
 			memDb = Database.connect(memoryDbUrl, driver = "org.h2.Driver", user = "sa", password = "")
 
 			createRequiredTables()
-
-			logger.info("H2 (Persistent + In-Memory) started successfully!")
 			true
 		} catch (e: Exception) {
 			logger.error("Failed to start H2 database: ${e.message}")
 			false
 		}
 	}
+
+	fun stop() {
+		try {
+			db.connector().close()
+			memDb.connector().close()
+		} catch (e: Exception) {
+			logger.warn("Failed to close database connections: ${e.message}")
+		}
+	}
+
 
 	@Suppress("RemoveRedundantQualifierName")
 	object Accessor {
@@ -189,6 +197,7 @@ class DataBase(private val plugin: BulletinBoard) {
 					return@forEach
 				}
 
+				@Suppress("UNCHECKED_CAST")
 				val idColumn = table.columns.firstOrNull { it.name == "id" } as? Column<String> ?: run {
 					logger.warn("No id column found in $tableName")
 					return@forEach
@@ -237,6 +246,7 @@ class DataBase(private val plugin: BulletinBoard) {
 					return@forEach
 				}
 
+				@Suppress("UNCHECKED_CAST")
 				val idCol = table.columns.firstOrNull { it.name == "id" } as? Column<String> ?: run {
 					logger.warn("No id column found in $tableName for delete")
 					return@forEach

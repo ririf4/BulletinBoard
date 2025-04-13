@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
-public class FabricordPluginLoader implements PluginLoader {
+@SuppressWarnings({"unused", "UnstableApiUsage"})
+public class BulletinBoardPluginLoader implements PluginLoader {
     @Override
     public void classloader(@NotNull PluginClasspathBuilder classpathBuilder) {
         MavenLibraryResolver resolver = new MavenLibraryResolver();

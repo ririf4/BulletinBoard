@@ -11,14 +11,15 @@ dependencies {
 	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-	paperLibrary("net.ririfa:igf:1.5.5-20250411.124811-4")
+	paperLibrary("net.ririfa:igf:1.5.9")
 	paperLibrary(kotlin("stdlib"))
 	paperLibrary(kotlin("reflect"))
 }
 
 paper {
 	main = "net.ririfa.bulletinboard.BulletinBoard"
-	loader = "net.ririfa.bulletinboard.loader.FabricordPluginLoader"
+	// I was tired. I wrote "FabricordPluginLoader". I should sleep
+	loader = "net.ririfa.bulletinboard.loader.BulletinBoardPluginLoader"
 	generateLibrariesJson = true
 	foliaSupported = false
 	apiVersion = "1.21"

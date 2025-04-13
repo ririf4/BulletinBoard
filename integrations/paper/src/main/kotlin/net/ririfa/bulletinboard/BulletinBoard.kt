@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.ririfa.beacon.EventBus
 import net.ririfa.bulletinboard.command.CommandManager
+import net.ririfa.bulletinboard.gui.GUIRelListener
 import net.ririfa.bulletinboard.translation.BBMSGProvider
 import net.ririfa.bulletinboard.translation.BBMessageKey
 import net.ririfa.bulletinboard.util.isOlderVersion
@@ -62,8 +63,7 @@ class BulletinBoard : JavaPlugin() {
 
 		langMan = LangMan.createNew<BBMSGProvider, TextComponent>(
 			{ Component.text(it) },
-			BBMessageKey::class,
-			isDebug = true
+			BBMessageKey::class
 		)
 
 		langMan.init(InitType.YAML, langDir.toFile(), availableLang)
@@ -74,6 +74,7 @@ class BulletinBoard : JavaPlugin() {
 
 	override fun onEnable() {
 		IGF.init(this, "net.ririfa.bulletinboard")
+		server.pluginManager.registerEvents(GUIRelListener(), this)
 		registerCommand(this)
 	}
 

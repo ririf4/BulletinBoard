@@ -4,10 +4,7 @@ import net.kyori.adventure.text.Component
 import net.ririfa.bulletinboard.DataBase
 import net.ririfa.bulletinboard.gui.GUIManager.openGUI
 import net.ririfa.bulletinboard.gui.GUIState
-import net.ririfa.bulletinboard.util.Post
-import net.ririfa.bulletinboard.util.ShortUUID
-import net.ririfa.bulletinboard.util.displayAbout
-import net.ririfa.bulletinboard.util.displayHelp
+import net.ririfa.bulletinboard.util.*
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -34,7 +31,7 @@ enum class Commands(val execute: CommandExecute) {
     HELP({ player, _ -> displayHelp(player) }),
     ABOUT({ player, _ -> displayAbout(player) }),
 
-    DEBUG({ player, _ -> /*player.getPlayerState().sendDebugMessage(player)*/ }),
+    DEBUG({ player, _ -> player.getPlayerState().sendDebugMessage(player) }),
     INSERTDEBUGPOST({ player, args ->
         if (player.hasPermission("bulletinboard.post.debug")) {
             if (args.size > 1 && (args[1] == "0" || args[1] == "1")) {
