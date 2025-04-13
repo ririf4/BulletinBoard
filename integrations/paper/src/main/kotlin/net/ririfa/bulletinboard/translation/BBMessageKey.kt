@@ -44,6 +44,8 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
 
             object EnterTitleEdit : Messages()
             object EnterContentEdit : Messages()
+
+            object NotPreviewing : Messages()
         }
 
         sealed class Editor : GUI() {

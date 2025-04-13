@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component
 import net.ririfa.bulletinboard.DataBase
 import net.ririfa.bulletinboard.gui.GUIManager.openGUI
 import net.ririfa.bulletinboard.gui.GUIState
+import net.ririfa.bulletinboard.translation.BBMessageKey
+import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
 import org.bukkit.entity.Player
 import java.util.*
@@ -17,16 +19,14 @@ enum class Commands(val execute: CommandExecute) {
     MYPOSTS({ player, _ -> openGUI(player, GUIState.MY_POSTS) }),
     DELETEDPOSTS({ player, _ -> openGUI(player, GUIState.DELETED_POSTS) }),
     PREVIEWCLOSE({ player, _ ->
-        //TODO
-//        val state = player.getPlayerState()
-//        val p = player.adapt()
-//        if (state.preview != null) {
-//            state.isPreviewing = null
-//            state.preview = null
-//            openPostEditor(player)
-//        } else {
-//            player.sendMessage(p.getMessage(Main.Command.Message.NOT_PREVIEWING))
-//        }
+        val state = player.getPlayerState()
+        val p = player.adapt()
+        if (state.confirmationState.preview != null) {
+            state.confirmationState.preview = null
+            openGUI(player, GUIState.NEW_POST)
+        } else {
+            player.sendMessage(p.getMessage(BBMessageKey.GUI.Messages.NotPreviewing))
+        }
     }),
     HELP({ player, _ -> displayHelp(player) }),
     ABOUT({ player, _ -> displayAbout(player) }),
