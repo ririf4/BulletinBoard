@@ -31,7 +31,7 @@ private val countryTimeZones = mapOf(
     "GB" to "Europe/London",    // イギリス
     "JP" to "Asia/Tokyo",       // 日本
     "AU" to "Australia/Sydney", // オーストラリア
-    "DE" to "Europe/Berlin",    // ドイツ
+    "DE" to "Europe/Berlin",    // ドイツlll
     "FR" to "Europe/Paris",     // フランス
     "CA" to "America/Toronto",  // カナダ
     "CN" to "Asia/Shanghai",    // 中国

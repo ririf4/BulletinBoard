@@ -15,6 +15,5 @@ rootProject.name = "BulletinBoard"
 
 include("integrations")
 
-
 include("integrations:paper")
 include("integrations:velocity")

@@ -8,6 +8,8 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
         object Title : GUI()
 
         sealed class Buttons : GUI() {
+            object BackButton : Buttons()
+
             sealed class MainBoard : Buttons() {
                 object NewPost : MainBoard()
                 object AllPosts : MainBoard()
@@ -44,6 +46,8 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
 
             object EnterTitleEdit : Messages()
             object EnterContentEdit : Messages()
+
+            object PostSaved : Messages()
 
             object NotPreviewing : Messages()
         }

@@ -1,6 +1,7 @@
 package net.ririfa.bulletinboard.gui
 
 import net.ririfa.bulletinboard.DataBase
+import net.ririfa.bulletinboard.Executor
 import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.gui.GUIState.*
 import net.ririfa.bulletinboard.translation.BBMessageKey.GUI
@@ -8,8 +9,10 @@ import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
 import net.ririfa.igf.*
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.jetbrains.exposed.sql.kotlin.datetime.Date
 
 object GUIManager {
     fun openGUI(player: Player, openState: GUIState = MAIN_BOARD) {
@@ -115,6 +118,10 @@ object GUIManager {
                     Button(24, Material.CAULDRON, GUI.Buttons.MyPosts.DeletePost.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.switchState(DELETE_POST_SELECTION)
+                        },
+                    Button(22, Material.BARRIER, ap.getMessage(GUI.Buttons.BackButton))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, _ ->
+                            openMain(player)
                         }
                 )
             },
@@ -130,6 +137,12 @@ object GUIManager {
                                 }
                         )
                     }
+                    add(
+                        Button(22, Material.BARRIER, ap.getMessage(GUI.Buttons.BackButton))
+                            .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, _ ->
+                                openMain(player)
+                            }
+                    )
                 }
             },
 
@@ -142,7 +155,61 @@ object GUIManager {
                     Button(24, Material.LAVA_BUCKET, GUI.Buttons.DeletedPosts.DeletePostPermanently.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.switchState(DELETE_POST_PERMANENTLY_SELECTION)
+                        },
+                    Button(22, Material.BARRIER, ap.getMessage(GUI.Buttons.BackButton))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, _ ->
+                            openGUI(player, MY_POSTS)
                         }
+                )
+            },
+
+            CONFIRM_SAVE_POST to { _ ->
+                listOf(
+//                    Button(11, Material.RED_WOOL, GUI.Confirm.Cancel.t(ap)) // キャンセル（編集画面に戻る）
+//                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+//                            gui.switchState(NEW_POST)
+//                        },
+//
+//                    Button(13, Material.BLUE_WOOL, GUI.Confirm.Preview.t(ap)) // プレビュー
+//                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+//                            val state = player.getPlayerState()
+//                            val preview = state.draftState.draft ?: return@setClickTyped
+//                            player.sendMessage(Component.text("-----[ Preview ]-----"))
+//                            player.sendMessage(ap.getMessage(GUI.Messages.TitleLabel, preview.title))
+//                            player.sendMessage(ap.getMessage(GUI.Messages.ContentLabel, preview.content))
+//                            player.sendMessage(Component.text("--------------------"))
+//                        },
+//
+//                    Button(15, Material.GREEN_WOOL, GUI.Confirm.Confirm.t(ap)) // 確定
+//                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+//                            val state = player.getPlayerState()
+//                            val draft = state.draftState.draft
+//                            if (draft == null) {
+//                                player.sendMessage(ap.getMessage(GUI.Messages.WhenPostDraftNull))
+//                                gui.close()
+//                                state.clearAll()
+//                                return@setClickTyped
+//                            }
+//
+//                            val post = Post(
+//                                id = ShortUUID.generate(),
+//                                title = draft.title,
+//                                content = draft.content,
+//                                author = player.uniqueId,
+//                                isAnonymous = draft.isAnonymous ?: false,
+//                                date = Date.from(Instant.now()),
+//                                isDeleted = false
+//                            )
+//
+//                            Executor.execute {
+//                               DataBase.Accessor.insertPost(post)
+//                            }
+//
+//                            gui.close()
+//                            state.clearAll()
+//                            player.playSoundMaster(Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1.5f)
+//                            player.sendMessage(ap.getMessage(GUI.Messages.PostSaved))
+//                        }
                 )
             },
 
