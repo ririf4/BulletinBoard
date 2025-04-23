@@ -1,7 +1,6 @@
 package net.ririfa.bulletinboard.gui
 
 import net.ririfa.bulletinboard.DataBase
-import net.ririfa.bulletinboard.Executor
 import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.gui.GUIState.*
 import net.ririfa.bulletinboard.translation.BBMessageKey.GUI
@@ -9,10 +8,8 @@ import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
 import net.ririfa.igf.*
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.jetbrains.exposed.sql.kotlin.datetime.Date
 
 object GUIManager {
     fun openGUI(player: Player, openState: GUIState = MAIN_BOARD) {
@@ -55,12 +52,13 @@ object GUIManager {
 
                     Button(19, Material.RED_WOOL, GUI.Editor.Cancel.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-                            playerState.clearDraft()
                             gui.switchState(CONFIRM_CANCEL_POST)
                         },
 
                     Button(25, Material.GREEN_WOOL, GUI.Editor.Save.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            playerState.confirmationState.preview // TODO
+                            playerState.confirmationState.type = ConfirmationType.SAVE_POST
                             gui.switchState(CONFIRM_SAVE_POST)
                         }
                 )
@@ -165,11 +163,11 @@ object GUIManager {
 
             CONFIRM_SAVE_POST to { _ ->
                 listOf(
-//                    Button(11, Material.RED_WOOL, GUI.Confirm.Cancel.t(ap)) // キャンセル（編集画面に戻る）
-//                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-//                            gui.switchState(NEW_POST)
-//                        },
-//
+                    Button(11, Material.RED_WOOL, GUI.Buttons.Confirmation.CancelCancelPost.t(ap)) // キャンセル（編集画面に戻る）
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.switchState(NEW_POST)
+                        },
+
 //                    Button(13, Material.BLUE_WOOL, GUI.Confirm.Preview.t(ap)) // プレビュー
 //                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
 //                            val state = player.getPlayerState()

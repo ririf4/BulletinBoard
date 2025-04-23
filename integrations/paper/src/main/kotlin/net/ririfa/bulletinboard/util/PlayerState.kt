@@ -96,8 +96,7 @@ data class InputState(
 )
 
 data class ConfirmationState(
-    var isOpening: Boolean? = null,
-    var isChoosingAnswer: Boolean? = null,
+    // If It's null, the player isn't opening confirmation
     var type: ConfirmationType? = null,
     var preview: Pair<TextComponent, TextComponent>? = null
 )

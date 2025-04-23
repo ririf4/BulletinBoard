@@ -38,6 +38,11 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
                 object Next : Paged()
                 object Previous : Paged()
             }
+
+            sealed class Confirmation : Buttons() {
+                //Cancel 'Cancel Post'
+                object CancelCancelPost : Confirmation()
+            }
         }
 
         sealed class Messages : GUI() {

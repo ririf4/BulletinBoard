@@ -13,10 +13,7 @@ allprojects {
 		implementation("net.ririfa:langman:+")
 		implementation("net.ririfa:beacon:+")
 		implementation("org.jetbrains.exposed:exposed-core:0.56.0")
-		implementation("org.jetbrains.exposed:exposed-dao:0.56.0")
 		implementation("org.jetbrains.exposed:exposed-jdbc:0.56.0")
-		implementation("org.jetbrains.exposed:exposed-json:0.56.0")
-		implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.56.0")
 	}
 }
 
