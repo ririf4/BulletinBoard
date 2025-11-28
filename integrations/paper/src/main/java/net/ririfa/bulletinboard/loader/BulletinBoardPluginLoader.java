@@ -34,7 +34,6 @@ public class BulletinBoardPluginLoader implements PluginLoader {
         classpathBuilder.addLibrary(resolver);
     }
 
-
     private PluginLibraries load() {
         InputStream input = getClass().getResourceAsStream("/paper-libraries.json");
         if (input == null) {

@@ -21,23 +21,35 @@ enum class Commands(val execute: CommandExecute) {
     PREVIEWCLOSE({ player, _ ->
         val state = player.getPlayerState()
         val p = player.adapt()
-        if (state.confirmationState.preview != null) {
-            state.confirmationState.preview = null
-            openGUI(player, GUIState.NEW_POST)
+
+        if (state.mode == PlayerMode.PREVIEWING_POST && state.draft != null) {
+            when (state.previewBeforeMode) {
+                PlayerMode.CREATING_POST -> {
+                    openGUI(player, GUIState.NEW_POST)
+                }
+
+                PlayerMode.EDITING_POST -> {
+                    openGUI(player, GUIState.EDIT_POST)
+                }
+
+                else -> {
+                    state.reset()
+                    player.sendMessage(p.getMessage(BBMessageKey.Messages.NotPreviewing))
+                }
+            }
         } else {
-            player.sendMessage(p.getMessage(BBMessageKey.GUI.Messages.NotPreviewing))
+            player.sendMessage(p.getMessage(BBMessageKey.Messages.NotPreviewing))
         }
     }),
     HELP({ player, _ -> displayHelp(player) }),
     ABOUT({ player, _ -> displayAbout(player) }),
 
-    DEBUG({ player, _ -> player.getPlayerState().sendDebugMessage(player) }),
     INSERTDEBUGPOST({ player, args ->
         if (player.hasPermission("bulletinboard.post.debug")) {
             if (args.size > 1 && (args[1] == "0" || args[1] == "1")) {
                 val isAnonymous = args[1] == "1"
 
-                val post = Post(
+                val post = DataBase.Post(
                     id = ShortUUID.generate(),
                     title = Component.text("Debug Post"),
                     content = Component.text("This is a debug post"),
@@ -46,7 +58,7 @@ enum class Commands(val execute: CommandExecute) {
                     date = Date(),
                     isDeleted = false
                 )
-                DataBase.Accessor.insertPost(post)
+                DataBase.insertPost(post)
                 player.sendMessage("Debug post inserted with isAnonymous set to $isAnonymous")
             } else {
                 player.sendMessage("Usage: /insertdebugpost <0 or 1>")

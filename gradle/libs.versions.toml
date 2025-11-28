@@ -1,0 +1,16 @@
+[versions]
+kotlin = "2.2.21"
+paper-yaml = "0.8.0"
+run-paper = "3.0.2"
+paperweight = "2.0.0-beta.19"
+
+akkara-plugin = "0.1.0+rc.1"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+paperyaml = { id = "de.eldoria.plugin-yml.paper", version.ref = "paper-yaml" }
+paperrun = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+
+akkara-plugin = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }

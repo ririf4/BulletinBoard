@@ -1,19 +1,20 @@
+import dev.swiftstorm.akkaradb.plugin.akkara
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
-	id("de.eldoria.plugin-yml.paper") version "0.7.1"
-	id("xyz.jpenilla.run-paper") version "2.3.1"
-	id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
+	alias(libs.plugins.paperweight)
+	alias(libs.plugins.paperyaml)
+	alias(libs.plugins.paperrun)
 }
 
 dependencies {
-	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-	compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+	paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
+	compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
 
-	paperLibrary("net.ririfa:igf:1.5.9")
-	paperLibrary(kotlin("stdlib"))
-	paperLibrary(kotlin("reflect"))
+	paperLibrary("net.ririfa:igf:2.0.0+mc.1.21.10")
+
+	akkara("0.1.0+rc.1", "paperLibrary")
 }
 
 paper {
