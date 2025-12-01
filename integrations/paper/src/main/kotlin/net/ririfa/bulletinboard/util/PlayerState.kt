@@ -55,11 +55,6 @@ data class PostDraft(
     var isAnonymous: Boolean = false
 )
 
-enum class InputType {
-    TITLE,
-    CONTENT
-}
-
 fun Player.getPlayerState(): PlayerState {
     return playerState.computeIfAbsent(this.uniqueId) { PlayerState() }
 }

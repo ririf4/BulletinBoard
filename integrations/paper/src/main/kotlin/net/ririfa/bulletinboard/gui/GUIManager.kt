@@ -1,14 +1,16 @@
 package net.ririfa.bulletinboard.gui
 
 import net.kyori.adventure.text.Component
-import net.ririfa.bulletinboard.DataBase
 import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.gui.GUIState.*
-import net.ririfa.bulletinboard.translation.BBMessageKey.Messages
 import net.ririfa.bulletinboard.translation.BBMessageKey.GUI
+import net.ririfa.bulletinboard.translation.BBMessageKey.Messages
 import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
-import net.ririfa.igf.*
+import net.ririfa.igf.Button
+import net.ririfa.igf.PaginatedDynamicGUI
+import net.ririfa.igf.SinglePage
+import net.ririfa.igf.setClickTyped
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -50,7 +52,65 @@ object GUIManager {
     }
 
     private fun openMain(player: Player) {
+        val titleAc = mapOf(
+            "version" to Plugin.version
+        )
+        val ap = player.adapt()
+        val fixedButtonProvider = mapOf<SinglePage, (SinglePage) -> List<Button>>(
+            SinglePage.PAGE to { state ->
+                listOf(
+                    Button(10, Material.WRITABLE_BOOK, GUI.Buttons.MainBoard.NewPost.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
+                            gui.close()
+                            openGUI(player, NEW_POST)
+                        },
+                    Button(12, Material.BOOK, GUI.Buttons.MainBoard.AllPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, ALL_POSTS)
+                        },
+                    Button(14, Material.WRITTEN_BOOK, GUI.Buttons.MainBoard.MyPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, MY_POSTS)
+                        },
+                    Button(16, Material.CAULDRON, GUI.Buttons.MainBoard.DeletedPosts.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, DELETED_POSTS)
+                        },
+                    Button(29, Material.LECTERN, GUI.Buttons.MainBoard.AboutPlugin.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            displayAbout(player)
+                        },
+                    Button(31, Material.COMPARATOR, GUI.Buttons.MainBoard.Settings.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            openGUI(player, SETTINGS)
+                        },
+                    Button(33, Material.OAK_SIGN, GUI.Buttons.MainBoard.Help.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            displayHelp(player)
+                        }
+                )
+            }
+        )
 
+        val gui = PaginatedDynamicGUI.of<SinglePage>(player)
+            .setStateFixedButtonProviders(fixedButtonProvider)
+            .onClose { _, reason ->
+                // If player closes gui, all state will clear
+                if (reason == InventoryCloseEvent.Reason.PLAYER) player.getPlayerState().reset()
+            }
+            .setState(SinglePage.PAGE)
+            .setTitle(ap.getMessage(GUI.Title, titleAc))
+            .setSize(45)
+            .setBackground(Material.GRAY_STAINED_GLASS_PANE)
+            .build()
+
+        gui.open()
     }
 
     private fun getFixedButtonProviders(player: Player): Map<GUIState, (GUIState) -> List<Button>> {

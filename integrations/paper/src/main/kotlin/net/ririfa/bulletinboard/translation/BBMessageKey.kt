@@ -8,6 +8,17 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
         object Title : GUI() // BulletinBoard %version%
 
         sealed class Buttons : GUI() {
+            sealed class MainBoard : Buttons() {
+                object NewPost : GUI() // 新しい投稿
+                object MyPosts : GUI() // マイ投稿
+                object AllPosts : GUI() // すべての投稿
+                object DeletedPosts : GUI() // 削除済み投稿
+                object AboutPlugin : GUI() // プラグインについて
+                object Settings : GUI() // 設定
+                object Help : GUI() // ヘルプ
+                object Discord : GUI() // Discord
+            }
+
             sealed class Pagination : Buttons() {
                 object Previous : GUI() // 前のページ
                 object Next : GUI() // 次のページ
