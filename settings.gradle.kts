@@ -9,8 +9,13 @@ pluginManagement {
 
 rootProject.name = "BulletinBoard"
 
-include("integrations:paper")
-project(":integrations:paper").name = "${rootProject.name}-paper"
+fun safeInclude(name: String, path: String) {
+	val dir = file(path)
+	if (dir.exists()) {
+		include(name)
+		project(":$name").projectDir = dir
+	}
+}
 
-include("integrations:velocity")
-project(":integrations:velocity").name = "${rootProject.name}-velocity"
+safeInclude("integrations:paper", "integrations/paper")
+safeInclude("integrations:velocity", "integrations/velocity")
