@@ -14,7 +14,7 @@ dependencies {
 
 	paperLibrary("net.ririfa:igf:2.0.0+mc.1.21.10")
 
-	akkara("0.1.0+rc.1", "paperLibrary")
+	akkara("0.2.0", "paperLibrary")
 }
 
 paper {
