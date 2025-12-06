@@ -28,6 +28,10 @@ public class BulletinBoardPluginLoader implements PluginLoader {
             resolver.addDependency(dep);
         }
         for (RemoteRepository repo : pluginLibraries.asRepositories()) {
+            if (repo.getUrl().equals("https://repo.maven.apache.org/maven2/")) {
+                resolver.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
+                continue;
+            }
             resolver.addRepository(repo);
         }
 

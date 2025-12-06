@@ -6,6 +6,11 @@ paperweight = "2.0.0-beta.19"
 
 akkara-plugin = "0.1.0"
 
+langman-core = "2.0.3"
+langman-ext-yaml = "2.0.1"
+
+igf = "2.0.6+mc.1.21.10"
+
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -14,3 +19,8 @@ paperrun = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 
 akkara-plugin = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }
+
+[libraries]
+langman-core = { module = "net.ririfa:langman-core", version.ref = "langman-core" }
+langman-ext-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langman-ext-yaml" }
+igf = { module = "net.ririfa:igf", version.ref = "igf" }

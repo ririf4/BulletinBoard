@@ -12,9 +12,12 @@ dependencies {
 	paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
 
-	paperLibrary("net.ririfa:igf:2.0.0+mc.1.21.10")
+    paperLibrary(kotlin("reflect"))
+    paperLibrary(libs.igf)
+    paperLibrary(libs.langman.core)
+    paperLibrary(libs.langman.ext.yaml)
 
-	akkara("0.2.0", "paperLibrary")
+    akkara("0.2.7+rc.4", "paperLibrary")
 }
 
 paper {
@@ -26,15 +29,19 @@ paper {
 	apiVersion = "1.21"
 	version = rootProject.version.toString()
 	name = rootProject.name
-	load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 	authors = listOf("RiriFa", "cotrin_d8")
 	description = "A simple bulletin board plugin"
 
 	serverDependencies {
-		register("LuckPerms") {
-			required = false
-			load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-		}
+        register("LuckPerms") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("Kotlin") {
+            required = true
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
 	}
 
 	permissions {
@@ -123,6 +130,10 @@ paper {
 			default = BukkitPluginDescription.Permission.Default.OP
 		}
 	}
+}
+
+tasks.generatePaperPluginDescription {
+    useDefaultCentralProxy()
 }
 
 tasks.named<Jar>("jar") {

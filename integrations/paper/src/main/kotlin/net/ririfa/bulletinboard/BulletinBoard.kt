@@ -3,12 +3,17 @@
 package net.ririfa.bulletinboard
 
 import com.google.gson.Gson
+import dev.swiftstorm.akkaradb.common.ByteBufferL
+import dev.swiftstorm.akkaradb.common.binpack.AdapterRegistry
+import dev.swiftstorm.akkaradb.common.binpack.TypeAdapter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.ririfa.bulletinboard.command.CommandManager
 import net.ririfa.bulletinboard.gui.GUIRelListener
 import net.ririfa.bulletinboard.translation.BBMSGProvider
 import net.ririfa.bulletinboard.translation.BBMessageKey
+import net.ririfa.bulletinboard.util.ShortUUID
 import net.ririfa.igf.IGF
 import net.ririfa.langman.LangMan
 import net.ririfa.langman.LangManBuilder
@@ -28,7 +33,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
-import java.util.concurrent.CountDownLatch
+import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
@@ -41,9 +47,6 @@ class BulletinBoard : JavaPlugin() {
 			private set
 
 		lateinit var langMan: LangMan<BBMSGProvider, TextComponent>
-			private set
-
-		lateinit var dataBase: DataBase
 			private set
 
 		val logger: Logger = LoggerFactory.getLogger(BulletinBoard::class.simpleName)
@@ -71,6 +74,9 @@ class BulletinBoard : JavaPlugin() {
 	override fun onLoad() {
 		instance = this
 		initLanguage()
+
+        AdapterRegistry.registerAdapter(ShortUUID::class, shortUUIDAdapter)
+        AdapterRegistry.registerAdapter(TextComponent::class, textComponentAdapter)
 	}
 
 	override fun onEnable() {
@@ -78,30 +84,36 @@ class BulletinBoard : JavaPlugin() {
 		server.pluginManager.registerEvents(GUIRelListener(), this)
 		server.pluginManager.registerEvents(playerListener, this)
 		registerMainCommand()
-	}
 
-	fun <T> execute(task: () -> T): T {
-		val resultHolder = arrayOfNulls<Any>(1)
-		val latch = CountDownLatch(1)
+        langMan.getAllTranslations("ja")?.forEach { (key, value) ->
+            Companion.logger.info("Key: $key => Value: $value")
+        }
+    }
 
-		Bukkit.getScheduler().runTask(Plugin, Runnable {
-			try {
-				resultHolder[0] = task()
-			} finally {
-				latch.countDown()
-			}
-		})
+    override fun onDisable() {
+        DB.close()
+    }
 
-		latch.await()
-		@Suppress("UNCHECKED_CAST")
-		return resultHolder[0] as T
-	}
+    fun <T> execute(task: () -> T): CompletableFuture<T> {
+        val future = CompletableFuture<T>()
+
+        Bukkit.getScheduler().runTask(Plugin, Runnable {
+            try {
+                future.complete(task())
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
+            }
+        })
+
+        return future
+    }
 
 	/**
 	 * Language System initialization
 	 */
 	private fun initLanguage() {
 		langMan = LangManBuilder.new<BBMSGProvider, TextComponent>()
+            .fromClass(BulletinBoard::class.java)
 			.fromResource("/assets/$ID/lang/")
 			.toPath(langDir)
 			.withMessageKey(BBMessageKey::class.java)
@@ -169,4 +181,52 @@ class BulletinBoard : JavaPlugin() {
 		override fun invoke(text: String): TextComponent =
 			Component.text(text)
 	}
+
+    private val shortUUIDAdapter = object : TypeAdapter<ShortUUID> {
+        override fun estimateSize(value: ShortUUID): Int = 16
+
+        override fun write(value: ShortUUID, buffer: ByteBufferL) {
+            buffer.i64 = value.uuid.mostSignificantBits
+            buffer.i64 = value.uuid.leastSignificantBits
+        }
+
+        override fun read(buffer: ByteBufferL): ShortUUID {
+            val msb = buffer.i64
+            val lsb = buffer.i64
+            return ShortUUID(UUID(msb, lsb))
+        }
+    }
+
+    private val textComponentAdapter = object : TypeAdapter<TextComponent> {
+        private val serializer = GsonComponentSerializer.gson()
+
+        override fun estimateSize(value: TextComponent): Int {
+            val json = serializer.serialize(value)
+            return 4 + json.length
+        }
+
+        override fun write(value: TextComponent, buffer: ByteBufferL) {
+            val json = serializer.serialize(value)
+            val bytes = json.toByteArray(Charsets.UTF_8)
+
+            buffer.i32 = bytes.size
+            buffer.putBytes(bytes)
+        }
+
+        override fun read(buffer: ByteBufferL): TextComponent {
+            val size = buffer.i32
+            require(size >= 0) { "Negative size: $size" }
+            require(buffer.remaining >= size) {
+                "Insufficient bytes: need=$size remaining=${buffer.remaining}"
+            }
+
+            val bytes = ByteArray(size)
+            repeat(size) { i ->
+                bytes[i] = buffer.i8.toByte()
+            }
+
+            val json = String(bytes, Charsets.UTF_8)
+            return serializer.deserialize(json) as TextComponent
+        }
+    }
 }

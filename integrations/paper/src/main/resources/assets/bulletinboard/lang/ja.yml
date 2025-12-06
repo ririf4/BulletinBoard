@@ -3,68 +3,22 @@ GUI:
 
   Buttons:
     MainBoard:
-      NewPost: "新規投稿"
-      AllPosts: "すべての投稿"
+      NewPost: "新しい投稿"
       MyPosts: "自分の投稿"
+      AllPosts: "すべての投稿"
       DeletedPosts: "削除された投稿"
       AboutPlugin: "このプラグインについて"
       Settings: "設定"
       Help: "ヘルプ"
+      Discord: "Discordに参加しよう！"
 
-    MyPosts:
-      EditPost: "投稿を編集"
-      DeletePost: "投稿を削除する"
-
-    AllPosts:
-      DeleteOthers: "他のユーザーの投稿を削除する"
-
-    DeletedPosts:
-      RestorePost: "投稿を復元する"
-      DeletePostPermanently: "投稿を完全に削除する"
-
-    Paged:
-      Next: "次のページ"
-      Previous: "前のページ"
-
-  Messages:
-    EnterTitle: "投稿のタイトルを入力してください:"
-    EnterContent: "投稿の内容を入力してください:"
-    EnterTitleEdit: "新しい投稿のタイトルを入力してください:"
-    EnterContentEdit: "新しい投稿の内容を入力してください:"
-
-  Editor:
-    NoTitle: "タイトルがありません..."
-    NoContent: "内容がありません..."
-    Save: "投稿を保存"
-    Cancel: "投稿をキャンセル"
-    SaveEdit: "編集を保存"
-    EditError: "編集エラー: %reason%"
-
-    EditErrorReason:
-      DraftNull: "編集投稿データがありません。もう一度お試しください"
-
-  Other:
-    NoPosts: "ここには何もないようです..."
-    UnknownPlayer: "不明なプレイヤー"
+Messages:
+  JoinDiscord: "Discordに参加して、コミュニティとつながりましょう！リンク: %link%"
 
 Command:
   DisplayPost:
+    AuthorLabel: "投稿者: %author%"
     TitleLabel: "タイトル: %title%"
-    ContentLabel: "内容: %content%"
-    AuthorLabel: "作成者: %author%"
+    ContentLabel: "コンテンツ: %content%"
     DateLabel: "日付: %date%"
     Anonymous: "匿名"
-
-  Help:
-    HelpHeader: "BulletinBoard コマンド一覧"
-    OpenBoard: "メインボードを開く"
-    NewPost: "新しい投稿を作成する"
-    MyPosts: "自分の投稿を表示する"
-    AllPosts: "全ての投稿を表示する"
-    Settings: "設定を開く"
-    DeletedPosts: "削除された投稿を表示する"
-    PreviewClose: "投稿プレビューを閉じる"
-
-  Other:
-    PlayerOnly: "このコマンドはプレイヤーのみ使用できます。"
-    UnknownCommand: "不明なコマンドです。ヘルプを表示するには /%command% を入力してください。"

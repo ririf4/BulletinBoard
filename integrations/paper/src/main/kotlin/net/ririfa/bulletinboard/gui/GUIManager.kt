@@ -1,16 +1,15 @@
 package net.ririfa.bulletinboard.gui
 
 import net.kyori.adventure.text.Component
+import net.ririfa.bulletinboard.DB
+import net.ririfa.bulletinboard.Logger
 import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.gui.GUIState.*
 import net.ririfa.bulletinboard.translation.BBMessageKey.GUI
 import net.ririfa.bulletinboard.translation.BBMessageKey.Messages
 import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.bulletinboard.util.*
-import net.ririfa.igf.Button
-import net.ririfa.igf.PaginatedDynamicGUI
-import net.ririfa.igf.SinglePage
-import net.ririfa.igf.setClickTyped
+import net.ririfa.igf.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -79,20 +78,25 @@ object GUIManager {
                             gui.close()
                             openGUI(player, DELETED_POSTS)
                         },
-                    Button(29, Material.LECTERN, GUI.Buttons.MainBoard.AboutPlugin.t(ap))
+                    Button(28, Material.LECTERN, GUI.Buttons.MainBoard.AboutPlugin.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.close()
                             displayAbout(player)
                         },
-                    Button(31, Material.COMPARATOR, GUI.Buttons.MainBoard.Settings.t(ap))
+                    Button(30, Material.COMPARATOR, GUI.Buttons.MainBoard.Settings.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.close()
                             openGUI(player, SETTINGS)
                         },
-                    Button(33, Material.OAK_SIGN, GUI.Buttons.MainBoard.Help.t(ap))
+                    Button(32, Material.OAK_SIGN, GUI.Buttons.MainBoard.Help.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             gui.close()
                             displayHelp(player)
+                        },
+                    Button(34, Material.ENCHANTED_GOLDEN_APPLE, GUI.Buttons.MainBoard.Discord.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            gui.close()
+                            showDiscordLink(player)
                         }
                 )
             }
@@ -369,8 +373,19 @@ object GUIManager {
         player: Player,
         middleRowSlots: List<Int>
     ): List<Button> {
-        //TODO
-        return emptyList()
+        return when (state) {
+            ALL_POSTS -> {
+                DB.getAllPosts()
+                    .mapIndexedNotNull { index, post ->
+                        middleRowSlots.getOrNull(index)?.let { slot ->
+                            Button(slot, Material.WRITTEN_BOOK, post.title)
+                                .setClick { Logger.info("click"); displayPost(player, post) }
+                        }
+                    }
+            }
+
+            else -> emptyList()
+        }
     }
 
     private fun getPageChangeButtons(player: Player): PageButtons {

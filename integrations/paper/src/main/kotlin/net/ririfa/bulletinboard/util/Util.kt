@@ -5,10 +5,18 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
+import net.ririfa.bulletinboard.DataBase
+import net.ririfa.bulletinboard.Logger
 import net.ririfa.bulletinboard.Plugin
+import net.ririfa.bulletinboard.translation.BBMessageKey
+import net.ririfa.bulletinboard.translation.adapt
 import net.ririfa.igf.Button
+import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun Player.playSoundMaster(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
@@ -36,69 +44,52 @@ private val countryTimeZones = mapOf(
     "NZ" to "Pacific/Auckland"  // ニュージーランド
 )
 
-//fun displayPost(player: Player, post: DataBase.Post?) {
-//    if (post == null) return
-//    val cp = player.adapt()
-//    val playerTimeZone = getPlayerTimeZone(player)
-//    // Date in Result can never be null
-//    val zonedDateTime = ZonedDateTime.ofInstant(post.date.toInstant(), playerTimeZone.toZoneId())
-//    val authorName =
-//        // First try. Get from online player
-//        Bukkit.getPlayer(post.author)?.name
-//        // Second try. Get from offline player
-//            ?: Bukkit.getOfflinePlayer(post.author).name
-//            // If a player is not found, display "Unknown Player"
-//            ?: cp.getMessage(BBMessageKey.GUI.Other.UnknownPlayer)
-//
-//    val authorComponent = if (!post.isAnonymous) {
-//        val ac = mapOf(
-//            "author" to authorName
-//        )
-//        cp.getMessage(BBMessageKey.Command.DisplayPost.AuthorLabel, ac)
-//    } else {
-//        val ac = mapOf(
-//            "author" to cp.getMessage(BBMessageKey.Command.DisplayPost.Anonymous).content()
-//        )
-//        cp.getMessage(BBMessageKey.Command.DisplayPost.AuthorLabel, ac)
-//    }
-//
-//    val plainTitle = PlainTextComponentSerializer.plainText().serialize(post.title)
-//    val plainContent = PlainTextComponentSerializer.plainText().serialize(post.content)
-//
-//    val titleAc = mapOf(
-//        "title" to plainTitle
-//    )
-//    val titleComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.TitleLabel, titleAc)
-//
-//    val contentAc = mapOf(
-//        "content" to plainContent
-//    )
-//    val contentComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.ContentLabel, contentAc)
-//
-//    val dateAc = mapOf(
-//        "date" to zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")).toString()
-//    )
-//    val dateComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.DateLabel, dateAc)
-//
-//    Plugin.execute {
-//        player.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-//
-//        val message = Component.text("---------------------------------", NamedTextColor.DARK_GRAY)
-//            .append(Component.newline())
-//            .append(titleComponent.color(NamedTextColor.WHITE))
-//            .append(Component.newline())
-//            .append(contentComponent.color(NamedTextColor.WHITE))
-//            .append(Component.newline())
-//            .append(authorComponent.color(NamedTextColor.WHITE))
-//            .append(Component.newline())
-//            .append(dateComponent.color(NamedTextColor.WHITE))
-//            .append(Component.newline())
-//            .append(Component.text("---------------------------------", NamedTextColor.DARK_GRAY))
-//
-//
-//        player.sendMessage(message)
-//    }
-//}
+fun displayPost(player: Player, post: DataBase.Post?) {
+    Logger.info("Displaying post ${post?.id} to player ${player.name}")
+    if (post == null) return
+    val cp = player.adapt()
+    val playerTimeZone = getPlayerTimeZone(player)
+    // Date in Result can never be null
+    val zonedDateTime = ZonedDateTime.ofInstant(post.date.toInstant(), playerTimeZone.toZoneId())
+    val authorName =
+        // First try. Get from online player
+        Bukkit.getPlayer(post.author)?.name
+        // Second try. Get from offline player
+            ?: Bukkit.getOfflinePlayer(post.author).name
+            // If a player is not found, display "Unknown Player"
+            ?: cp.getMessage(BBMessageKey.GUI.Other.UnknownPlayer)
+
+    val author = if (!post.isAnonymous) {
+        authorName
+    } else {
+        cp.getMessage(BBMessageKey.Command.DisplayPost.Anonymous).content()
+    }
+
+    val authorComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.AuthorLabel, mapOf("author" to author))
+    val titleComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.TitleLabel, mapOf("title" to post.title.content()))
+    val contentComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.ContentLabel, mapOf("content" to post.content.content()))
+    val dateComponent = cp.getMessage(
+        BBMessageKey.Command.DisplayPost.DateLabel,
+        mapOf("date" to zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")).toString())
+    )
+
+    Plugin.execute { player.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
+
+    val message = Component.text("---------------------------------", NamedTextColor.DARK_GRAY)
+        .append(Component.newline())
+        .append(titleComponent.color(NamedTextColor.WHITE))
+        .append(Component.newline())
+        .append(contentComponent.color(NamedTextColor.WHITE))
+        .append(Component.newline())
+        .append(authorComponent.color(NamedTextColor.WHITE))
+        .append(Component.newline())
+        .append(dateComponent.color(NamedTextColor.WHITE))
+        .append(Component.newline())
+        .append(Component.text("---------------------------------", NamedTextColor.DARK_GRAY))
+
+
+    player.sendMessage(message)
+}
 
 fun displayAbout(player: Player) {
     player.playSoundMaster(Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 2.0f)
@@ -127,6 +118,10 @@ fun displayAbout(player: Player) {
             .color(NamedTextColor.DARK_GREEN)
             .decorate(TextDecoration.BOLD)
     )
+}
+
+fun showDiscordLink(player: Player) {
+    TODO()
 }
 
 data class PageButtons(
@@ -166,15 +161,4 @@ fun displayHelp(player: Player) {
 //        )
 //    }
 //    player.sendMessage(Component.text("=======================").color(NamedTextColor.GOLD))
-}
-
-fun isOlderVersion(current: String, latest: String): Boolean {
-    val currentParts = current.split(".").map { it.toIntOrNull() ?: 0 }
-    val latestParts = latest.split(".").map { it.toIntOrNull() ?: 0 }
-
-    val maxLength = maxOf(currentParts.size, latestParts.size)
-    val paddedCurrent = currentParts + List(maxLength - currentParts.size) { 0 }
-    val paddedLatest = latestParts + List(maxLength - latestParts.size) { 0 }
-
-    return (0 until maxLength).any { paddedCurrent[it] < paddedLatest[it] }
 }

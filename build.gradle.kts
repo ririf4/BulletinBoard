@@ -25,12 +25,6 @@ allprojects {
         maven("https://repo.ririfa.net/maven2") { name = "RiriFaRepo" }
         maven("https://api.modrinth.com/maven") { name = "Modrinth" }
     }
-
-    dependencies {
-        implementation("net.ririfa:langman-core:+")
-        implementation("net.ririfa:langman-ext.yaml:+")
-        implementation("net.ririfa:beacon:+")
-    }
 }
 
 subprojects {
