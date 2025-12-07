@@ -56,6 +56,7 @@ enum class Commands(val execute: CommandExecute) {
                     author = player.uniqueId,
                     isAnonymous = isAnonymous,
                     date = Date(),
+                    editedOn = Date(),
                     isDeleted = false
                 )
                 DataBase.insertPost(post)

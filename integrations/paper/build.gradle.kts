@@ -12,12 +12,13 @@ dependencies {
 	paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
 	compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
 
+    paperLibrary(kotlin("stdlib"))
     paperLibrary(kotlin("reflect"))
     paperLibrary(libs.igf)
     paperLibrary(libs.langman.core)
     paperLibrary(libs.langman.ext.yaml)
 
-    akkara("0.2.7+rc.4", "paperLibrary")
+    akkara("0.2.7+rc.6", "paperLibrary")
 }
 
 paper {
@@ -38,22 +39,21 @@ paper {
             required = false
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
         }
-        register("Kotlin") {
-            required = true
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
 	}
 
 	permissions {
 		register("bulletinboard.*") {
 			children = listOf(
-				"bulletinboard.admin",
-				"bulletinboard.gui.use",
-				"bulletinboard.post.delete.own",
-				"bulletinboard.post.create",
-				"bulletinboard.post.edit.own",
-				"bulletinboard.post.view",
-				"bulletinboard.post.anonymous"
+                "bulletinboard.admin",
+                "bulletinboard.gui.use",
+                "bulletinboard.post.delete.own",
+                "bulletinboard.post.create",
+                "bulletinboard.post.edit.own",
+                "bulletinboard.post.view",
+                "bulletinboard.post.anonymous",
+                "bulletinboard.post.delete.other",
+                "bulletinboard.post.edit.other",
+                "bulletinboard.reload"
 			)
 
 			childrenMap = mapOf(

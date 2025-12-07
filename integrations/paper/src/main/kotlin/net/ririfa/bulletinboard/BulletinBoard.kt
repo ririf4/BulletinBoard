@@ -2,7 +2,6 @@
 
 package net.ririfa.bulletinboard
 
-import com.google.gson.Gson
 import dev.swiftstorm.akkaradb.common.ByteBufferL
 import dev.swiftstorm.akkaradb.common.binpack.AdapterRegistry
 import dev.swiftstorm.akkaradb.common.binpack.TypeAdapter
@@ -23,7 +22,6 @@ import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -42,6 +40,7 @@ class BulletinBoard : JavaPlugin() {
 
 	companion object {
 		const val ID = "bulletinboard"
+        const val DISCORD_INVITE = "https://discord.ririfa.net"
 
 		lateinit var instance: BulletinBoard
 			private set
@@ -76,7 +75,7 @@ class BulletinBoard : JavaPlugin() {
 		initLanguage()
 
         AdapterRegistry.registerAdapter(ShortUUID::class, shortUUIDAdapter)
-        AdapterRegistry.registerAdapter(TextComponent::class, textComponentAdapter)
+        AdapterRegistry.registerAdapter(Component::class, textComponentAdapter)
 	}
 
 	override fun onEnable() {
@@ -84,10 +83,6 @@ class BulletinBoard : JavaPlugin() {
 		server.pluginManager.registerEvents(GUIRelListener(), this)
 		server.pluginManager.registerEvents(playerListener, this)
 		registerMainCommand()
-
-        langMan.getAllTranslations("ja")?.forEach { (key, value) ->
-            Companion.logger.info("Key: $key => Value: $value")
-        }
     }
 
     override fun onDisable() {
@@ -163,17 +158,10 @@ class BulletinBoard : JavaPlugin() {
 
 		@EventHandler
 		fun onPlayerQuit(event: PlayerQuitEvent) {
-			val gson = Gson()
-			val player = event.player
-			val inv = player.inventory
 
-			val nmsPlayer = (player as CraftPlayer).handle
 		}
 	}
 
-	/**
-	 * Text factory used by LangMan
-	 */
 	private val textFactory = object : TextFactory<TextComponent> {
 		override val clazz: Class<TextComponent>
 			get() = TextComponent::class.java
@@ -197,15 +185,15 @@ class BulletinBoard : JavaPlugin() {
         }
     }
 
-    private val textComponentAdapter = object : TypeAdapter<TextComponent> {
+    private val textComponentAdapter = object : TypeAdapter<Component> {
         private val serializer = GsonComponentSerializer.gson()
 
-        override fun estimateSize(value: TextComponent): Int {
+        override fun estimateSize(value: Component): Int {
             val json = serializer.serialize(value)
             return 4 + json.length
         }
 
-        override fun write(value: TextComponent, buffer: ByteBufferL) {
+        override fun write(value: Component, buffer: ByteBufferL) {
             val json = serializer.serialize(value)
             val bytes = json.toByteArray(Charsets.UTF_8)
 
@@ -213,7 +201,7 @@ class BulletinBoard : JavaPlugin() {
             buffer.putBytes(bytes)
         }
 
-        override fun read(buffer: ByteBufferL): TextComponent {
+        override fun read(buffer: ByteBufferL): Component {
             val size = buffer.i32
             require(size >= 0) { "Negative size: $size" }
             require(buffer.remaining >= size) {

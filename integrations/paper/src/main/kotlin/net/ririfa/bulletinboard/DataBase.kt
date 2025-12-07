@@ -7,7 +7,7 @@ import dev.swiftstorm.akkaradb.engine.Id
 import dev.swiftstorm.akkaradb.engine.PackedTable
 import dev.swiftstorm.akkaradb.engine.StartupMode
 import dev.swiftstorm.akkaradb.format.akk.parity.RSParityCoder
-import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.Component
 import net.ririfa.bulletinboard.util.ShortUUID
 import org.bukkit.entity.Player
 import java.util.*
@@ -17,7 +17,6 @@ object DataBase {
     var settingsInitialized = false
 
     val posts: PackedTable<Post, ShortUUID> by lazy {
-        Logger.info("Initializing Database...")
         postsInitialized = true
 		AkkDSL.open(DBDir.resolve("posts"), StartupMode.ULTRA_FAST) {
 			m = 2; parityCoder = RSParityCoder(2)
@@ -25,7 +24,6 @@ object DataBase {
 	}
 
     val playerSettings: PackedTable<PlayerSettings, UUID> by lazy {
-        Logger.info("Initializing Database...")
         settingsInitialized = true
 		AkkDSL.open(DBDir.resolve("settings"), StartupMode.ULTRA_FAST) {
 			m = 2; parityCoder = RSParityCoder(2)
@@ -37,13 +35,13 @@ object DataBase {
 	}
 
 	fun getMyPosts(player: Player): List<Post> {
+
 		return posts.runToList {
 			author == player.uniqueId && !isDeleted
 		}
 	}
 
 	fun getAllPosts(): List<Post> {
-        println("Getting all posts...")
         return posts.runToList { !isDeleted }
 	}
 
@@ -56,27 +54,22 @@ object DataBase {
 	}
 
     fun close() {
-        Logger.info("Closing databases...")
-
         if (postsInitialized) {
-            Logger.info("Closing posts...")
             posts.close()
         }
         if (settingsInitialized) {
-            Logger.info("Closing settings...")
             playerSettings.close()
         }
-
-        Logger.info("Database shutdown complete")
     }
 
 	data class Post(
         @Id val id: ShortUUID,
         val author: UUID,
-        val title: TextComponent,
-        val content: TextComponent,
+        val title: Component,
+        val content: Component,
         val isAnonymous: Boolean,
         val date: Date,
+        val editedOn: Date,
         val isDeleted: Boolean,
 	)
 

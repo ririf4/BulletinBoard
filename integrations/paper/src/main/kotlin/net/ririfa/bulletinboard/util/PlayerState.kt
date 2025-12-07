@@ -1,6 +1,7 @@
 package net.ririfa.bulletinboard.util
 
 import net.kyori.adventure.text.Component
+import net.ririfa.bulletinboard.DataBase
 import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -52,8 +53,20 @@ data class PostDraft(
     var id: ShortUUID,
     var title: Component,
     var content: Component,
-    var isAnonymous: Boolean = false
-)
+    var isAnonymous: Boolean,
+    var date: Date
+) {
+    fun toPost(player: Player) = DataBase.Post(
+        id,
+        player.uniqueId,
+        title,
+        content,
+        isAnonymous,
+        Date(),
+        Date(),
+        false
+    )
+}
 
 fun Player.getPlayerState(): PlayerState {
     return playerState.computeIfAbsent(this.uniqueId) { PlayerState() }

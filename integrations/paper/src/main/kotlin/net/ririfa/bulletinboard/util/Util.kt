@@ -5,8 +5,9 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.ririfa.bulletinboard.BulletinBoard.Companion.DISCORD_INVITE
 import net.ririfa.bulletinboard.DataBase
-import net.ririfa.bulletinboard.Logger
 import net.ririfa.bulletinboard.Plugin
 import net.ririfa.bulletinboard.translation.BBMessageKey
 import net.ririfa.bulletinboard.translation.adapt
@@ -45,7 +46,6 @@ private val countryTimeZones = mapOf(
 )
 
 fun displayPost(player: Player, post: DataBase.Post?) {
-    Logger.info("Displaying post ${post?.id} to player ${player.name}")
     if (post == null) return
     val cp = player.adapt()
     val playerTimeZone = getPlayerTimeZone(player)
@@ -66,8 +66,8 @@ fun displayPost(player: Player, post: DataBase.Post?) {
     }
 
     val authorComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.AuthorLabel, mapOf("author" to author))
-    val titleComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.TitleLabel, mapOf("title" to post.title.content()))
-    val contentComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.ContentLabel, mapOf("content" to post.content.content()))
+    val titleComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.TitleLabel, mapOf("title" to post.title.str))
+    val contentComponent = cp.getMessage(BBMessageKey.Command.DisplayPost.ContentLabel, mapOf("content" to post.content.str))
     val dateComponent = cp.getMessage(
         BBMessageKey.Command.DisplayPost.DateLabel,
         mapOf("date" to zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")).toString())
@@ -121,7 +121,11 @@ fun displayAbout(player: Player) {
 }
 
 fun showDiscordLink(player: Player) {
-    TODO()
+    val ap = player.adapt()
+    val t = ap.getMessage(BBMessageKey.Messages.JoinDiscord, mapOf("link" to DISCORD_INVITE)).content()
+    val msg = Component.text(t)
+    player.sendMessage(msg)
+    Plugin.execute { player.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
 }
 
 data class PageButtons(
@@ -133,32 +137,35 @@ fun Component.text(shortUUID: ShortUUID, style: Style): TextComponent {
     return Component.text(shortUUID.toShortString(), style)
 }
 
+val Component.str: String
+    get() = GsonComponentSerializer.gson().serialize(this)
+
 fun displayHelp(player: Player) {
-//    val p = player.adapt()
-//    val headerComponent = p.getMessage(BBMessageKey.Command.Help.HelpHeader)
-//        .color(NamedTextColor.GOLD)
-//        .decorate(TextDecoration.BOLD)
-//
-//    val hStartComponent = Component.text("=======").color(NamedTextColor.GOLD)
-//    val hEndComponent = Component.text("=======").color(NamedTextColor.GOLD)
-//
-//    val commandsDescription = listOf(
-//        "openboard" to BBMessageKey.Command.Help.OpenBoard,
-//        "newpost" to BBMessageKey.Command.Help.NewPost,
-//        "myposts" to BBMessageKey.Command.Help.MyPosts,
-//        "posts" to BBMessageKey.Command.Help.AllPosts,
-//        "settings" to BBMessageKey.Command.Help.Settings,
-//        "deletedposts" to BBMessageKey.Command.Help.DeletedPosts,
-//        "previewclose" to BBMessageKey.Command.Help.PreviewClose
-//    )
-//
-//    player.sendMessage(hStartComponent.append(headerComponent).append(hEndComponent))
-//
-//    commandsDescription.forEach { (command, key) ->
-//        player.sendMessage(
-//            Component.text("$command - ").append(p.getMessage(key))
-//                .color(NamedTextColor.GREEN)
-//        )
-//    }
-//    player.sendMessage(Component.text("=======================").color(NamedTextColor.GOLD))
+    val p = player.adapt()
+    val headerComponent = p.getMessage(BBMessageKey.Command.Help.HelpHeader)
+        .color(NamedTextColor.GOLD)
+        .decorate(TextDecoration.BOLD)
+
+    val hStartComponent = Component.text("=======").color(NamedTextColor.GOLD)
+    val hEndComponent = Component.text("=======").color(NamedTextColor.GOLD)
+
+    val commandsDescription = listOf(
+        "openboard" to BBMessageKey.Command.Help.OpenBoard,
+        "newpost" to BBMessageKey.Command.Help.NewPost,
+        "myposts" to BBMessageKey.Command.Help.MyPosts,
+        "posts" to BBMessageKey.Command.Help.AllPosts,
+        "settings" to BBMessageKey.Command.Help.Settings,
+        "deletedposts" to BBMessageKey.Command.Help.DeletedPosts,
+        "previewclose" to BBMessageKey.Command.Help.PreviewClose
+    )
+
+    player.sendMessage(hStartComponent.append(headerComponent).append(hEndComponent))
+
+    commandsDescription.forEach { (command, key) ->
+        player.sendMessage(
+            Component.text("$command - ").append(p.getMessage(key))
+                .color(NamedTextColor.GREEN)
+        )
+    }
+    player.sendMessage(Component.text("=======================").color(NamedTextColor.GOLD))
 }

@@ -2,6 +2,8 @@ GUI:
   Title: "BulletinBoard %version%"
 
   Buttons:
+    BackButton: "戻る"
+
     MainBoard:
       NewPost: "新しい投稿"
       MyPosts: "自分の投稿"
@@ -13,12 +15,32 @@ GUI:
       Discord: "Discordに参加しよう！"
 
 Messages:
+  PostSaved: "投稿が保存されました"
+
   JoinDiscord: "Discordに参加して、コミュニティとつながりましょう！リンク: %link%"
 
+  Edit:
+    EnterTitle: "投稿のタイトルを入力してください:"
+    EnterContent: "投稿の内容を入力してください:"
+
 Command:
+  Help:
+    HelpHeader: "BulletinBoard コマンド一覧"
+    OpenBoard: "メインボードを開く"
+    NewPost: "新しい投稿を作成する"
+    MyPosts: "自分の投稿を表示する"
+    AllPosts: "全ての投稿を表示する"
+    Settings: "設定を開く"
+    DeletedPosts: "削除された投稿を表示する"
+    PreviewClose: "投稿プレビューを閉じる"
+
   DisplayPost:
     AuthorLabel: "投稿者: %author%"
     TitleLabel: "タイトル: %title%"
     ContentLabel: "コンテンツ: %content%"
     DateLabel: "日付: %date%"
     Anonymous: "匿名"
+
+  Other:
+    PlayerOnly: "このコマンドはプレイヤーのみ使用できます。"
+    UnknownCommand: "不明なコマンドです。ヘルプを表示するには /%command% を入力してください。"
