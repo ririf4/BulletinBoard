@@ -14,6 +14,17 @@ GUI:
       Help: "ヘルプ"
       Discord: "Discordに参加しよう！"
 
+    MyPosts:
+      EditPost: "投稿を編集"
+      DeletePost: "投稿を削除"
+
+    AllPosts:
+      DeleteOthers: "投稿を削除"
+
+    DeletedPosts:
+      RestorePost: "投稿を復元"
+      DeletePostPermanently: "投稿を完全に削除"
+
 Messages:
   PostSaved: "投稿が保存されました"
 

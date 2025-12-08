@@ -19,7 +19,7 @@ object DataBase {
     val posts: PackedTable<Post, ShortUUID> by lazy {
         postsInitialized = true
 		AkkDSL.open(DBDir.resolve("posts"), StartupMode.ULTRA_FAST) {
-			m = 2; parityCoder = RSParityCoder(2)
+			m = 2; parityCoder = RSParityCoder(2); debug = true
 		}
 	}
 
@@ -35,7 +35,6 @@ object DataBase {
 	}
 
 	fun getMyPosts(player: Player): List<Post> {
-
 		return posts.runToList {
 			author == player.uniqueId && !isDeleted
 		}

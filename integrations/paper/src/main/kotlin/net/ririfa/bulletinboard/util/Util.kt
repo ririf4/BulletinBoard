@@ -2,6 +2,7 @@ package net.ririfa.bulletinboard.util
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
@@ -124,6 +125,7 @@ fun showDiscordLink(player: Player) {
     val ap = player.adapt()
     val t = ap.getMessage(BBMessageKey.Messages.JoinDiscord, mapOf("link" to DISCORD_INVITE)).content()
     val msg = Component.text(t)
+        .clickEvent(ClickEvent.openUrl(DISCORD_INVITE))
     player.sendMessage(msg)
     Plugin.execute { player.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
 }

@@ -356,15 +356,15 @@ object GUIManager {
             //----------------------------------------------------------------------
             // CONFIRM_CANCEL_POST（キャンセル）
             //----------------------------------------------------------------------
-//            CONFIRM_CANCEL_POST to { _ ->
-//                listOf(
-//                    Button(13, Material.BARRIER, GUI.Buttons.Confirmation.CancelCancelPost.t(ap))
-//                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
-//                            ps.reset()
-//                            gui.switchState(MAIN_BOARD)
-//                        }
-//                )
-//            }
+            CONFIRM_CANCEL_POST to { _ ->
+                listOf(
+                    Button(13, Material.BARRIER, GUI.Buttons.Confirmation.CancelCancelPost.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { p, _ ->
+                            ps.reset()
+                            openMain(p)
+                        }
+                )
+            }
         )
     }
 
