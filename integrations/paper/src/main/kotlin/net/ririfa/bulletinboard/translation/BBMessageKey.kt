@@ -32,7 +32,13 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
 
             sealed class Confirmation : Buttons() {
                 object CancelCancelPost : Confirmation()
-                object Confirm : Confirmation()
+                object CancelCancelEdit : Confirmation()
+
+                object ConfirmSavePost : Confirmation()
+                object ConfirmSaveEdit : Confirmation()
+
+                object ConfirmCancelPost : Confirmation()
+                object ConfirmCancelEdit : Confirmation()
 
                 object CancelEdit : Confirmation()
             }

@@ -12,7 +12,7 @@ GUI:
       AboutPlugin: "このプラグインについて"
       Settings: "設定"
       Help: "ヘルプ"
-      Discord: "Discordに参加しよう！"
+      Discord: "Discordに参加しよう!"
 
     MyPosts:
       EditPost: "投稿を編集"
@@ -21,18 +21,46 @@ GUI:
     AllPosts:
       DeleteOthers: "投稿を削除"
 
+    Confirmation:
+      CancelCancelPost: "キャンセルを取り消す"
+      Confirm: "確認"
+      CancelEdit: "編集をキャンセル"
+
     DeletedPosts:
       RestorePost: "投稿を復元"
       DeletePostPermanently: "投稿を完全に削除"
 
+    Pagination:
+      Previous: "前のページ"
+      Next: "次のページ"
+
+  Editor:
+    NoTitle: "タイトルがありません..."
+    NoContent: "コンテンツがありません..."
+    Save: "投稿を保存"
+    Cancel: "投稿をキャンセル"
+    SaveEdit: "編集を保存"
+    CancelEdit: "編集をキャンセル"
+    EditError: "編集エラー"
+    EditErrorReason:
+      DraftNull: "投稿の下書きが存在しません。"
+
+  Other:
+    NoPosts: "投稿がありません..."
+    UnknownPlayer: "不明なプレイヤー"
+
 Messages:
   PostSaved: "投稿が保存されました"
-
+  PostEdited: "投稿が編集されました"
+  NotPreviewing: "プレビュー中ではありません。"
+  PostDraftNull: "投稿の下書きが存在しません。"
   JoinDiscord: "Discordに参加して、コミュニティとつながりましょう！リンク: %link%"
 
   Edit:
     EnterTitle: "投稿のタイトルを入力してください:"
     EnterContent: "投稿の内容を入力してください:"
+    EnterTitleEdit: "投稿の新しいタイトルを入力してください:"
+    EnterContentEdit: "投稿の新しい内容を入力してください:"
 
 Command:
   Help:

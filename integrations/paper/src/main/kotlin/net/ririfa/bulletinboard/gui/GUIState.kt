@@ -1,8 +1,8 @@
 package net.ririfa.bulletinboard.gui
 
-enum class GUIState() {
-    MAIN_BOARD, // メイン画面
-    NEW_POST, //
+enum class GUIState {
+    MAIN_BOARD,
+    NEW_POST,
     EDIT_POST,
     MY_POSTS,
     ALL_POSTS,
@@ -16,7 +16,10 @@ enum class GUIState() {
     DELETE_POST_PERMANENTLY_SELECTION,
 
     CONFIRM_SAVE_POST,
-    CONFIRM_CANCEL_POST,
     CONFIRM_SAVE_EDIT,
+
+    CONFIRM_CANCEL_POST,
+    CONFIRM_CANCEL_EDIT,
+
     CONFIRM_DELETE_POST
 }

@@ -46,10 +46,10 @@ private val countryTimeZones = mapOf(
     "NZ" to "Pacific/Auckland"  // ニュージーランド
 )
 
-fun displayPost(player: Player, post: DataBase.Post?) {
+fun Player.displayPost(post: DataBase.Post?) {
     if (post == null) return
-    val cp = player.adapt()
-    val playerTimeZone = getPlayerTimeZone(player)
+    val cp = adapt()
+    val playerTimeZone = getPlayerTimeZone(this)
     // Date in Result can never be null
     val zonedDateTime = ZonedDateTime.ofInstant(post.date.toInstant(), playerTimeZone.toZoneId())
     val authorName =
@@ -74,7 +74,7 @@ fun displayPost(player: Player, post: DataBase.Post?) {
         mapOf("date" to zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")).toString())
     )
 
-    Plugin.execute { player.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
+    Plugin.execute { this.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
 
     val message = Component.text("---------------------------------", NamedTextColor.DARK_GRAY)
         .append(Component.newline())
@@ -89,7 +89,7 @@ fun displayPost(player: Player, post: DataBase.Post?) {
         .append(Component.text("---------------------------------", NamedTextColor.DARK_GRAY))
 
 
-    player.sendMessage(message)
+    this.sendMessage(message)
 }
 
 fun displayAbout(player: Player) {

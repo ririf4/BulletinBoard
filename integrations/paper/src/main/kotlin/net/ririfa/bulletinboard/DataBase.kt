@@ -52,6 +52,12 @@ object DataBase {
 		}
 	}
 
+    fun getDeletedPost(): List<Post> {
+        return posts.runToList {
+            isDeleted
+        }
+    }
+
     fun close() {
         if (postsInitialized) {
             posts.close()

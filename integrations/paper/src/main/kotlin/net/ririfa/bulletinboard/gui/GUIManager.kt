@@ -19,7 +19,15 @@ object GUIManager {
     private val paginationEnableState = setOf(
         ALL_POSTS,
         MY_POSTS,
-        DELETED_POSTS
+        DELETED_POSTS,
+
+        EDIT_POST_SELECTION,
+
+        DELETE_POST_SELECTION,
+        DELETE_POST_OTHERS_SELECTION,
+        DELETE_POST_PERMANENTLY_SELECTION,
+
+        RESTORE_POST_SELECTION,
     )
 
     private val middleRowSlots = listOf(10, 12, 14, 16)
@@ -42,7 +50,7 @@ object GUIManager {
             .onClose { _, reason -> if (reason == InventoryCloseEvent.Reason.PLAYER) player.getPlayerState().reset() }
             .setState(state)
             .setSize(27)
-            .setTitle(getTitle(player))
+            .setTitle(getGUITitle(player))
             .setBackground(Material.GRAY_STAINED_GLASS_PANE)
             .build()
 
@@ -298,7 +306,7 @@ object GUIManager {
                         },
 
                     // 確定（保存処理）
-                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.Confirm.t(ap))
+                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.ConfirmSavePost.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             val draft = ps.draft ?: return@setClickTyped
                             val post = DataBase.Post(
@@ -332,7 +340,7 @@ object GUIManager {
                             gui.switchState(EDIT_POST)
                         },
 
-                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.Confirm.t(ap))
+                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.ConfirmSaveEdit.t(ap))
                         .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                             val draft = ps.draft ?: return@setClickTyped
 
@@ -358,10 +366,34 @@ object GUIManager {
             //----------------------------------------------------------------------
             CONFIRM_CANCEL_POST to { _ ->
                 listOf(
-                    Button(13, Material.BARRIER, GUI.Buttons.Confirmation.CancelCancelPost.t(ap))
-                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { p, _ ->
+                    Button(11, Material.RED_WOOL, GUI.Buttons.Confirmation.CancelCancelPost.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            ps.mode = PlayerMode.CREATING_POST
+                            gui.switchState(NEW_POST)
+                        },
+
+                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.ConfirmCancelPost.t(ap))
+                        .setClick {
                             ps.reset()
-                            openMain(p)
+                            openMain(player)
+                        }
+                )
+            },
+
+            //----------------------------------------------------------------------
+            // CONFIRM_CANCEL_EDIT (キャンセル)
+            CONFIRM_CANCEL_EDIT to { _ ->
+                listOf(
+                    Button(11, Material.RED_WOOL, GUI.Buttons.Confirmation.CancelCancelEdit.t(ap))
+                        .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
+                            ps.mode = PlayerMode.EDITING_POST
+                            gui.switchState(EDIT_POST)
+                        },
+
+                    Button(15, Material.GREEN_WOOL, GUI.Buttons.Confirmation.ConfirmCancelEdit.t(ap))
+                        .setClick {
+                            ps.reset()
+                            openMain(player)
                         }
                 )
             }
@@ -379,7 +411,7 @@ object GUIManager {
                     .mapIndexedNotNull { index, post ->
                         middleRowSlots.getOrNull(index)?.let { slot ->
                             Button(slot, Material.WRITTEN_BOOK, post.title)
-                                .setClick { displayPost(player, post) }
+                                .setClick { player.displayPost(post) }
                         }
                     }
             }
@@ -389,7 +421,7 @@ object GUIManager {
                     .mapIndexedNotNull { index, post ->
                         middleRowSlots.getOrNull(index)?.let { slot ->
                             Button(slot, Material.WRITTEN_BOOK, post.title)
-                                .setClick { displayPost(player, post) }
+                                .setClick { player.displayPost(post) }
                         }
                     }
             }
@@ -399,7 +431,33 @@ object GUIManager {
                     .mapIndexedNotNull { index, post ->
                         middleRowSlots.getOrNull(index)?.let { slot ->
                             Button(slot, Material.WRITTEN_BOOK, post.title)
-                                .setClick { displayPost(player, post) }
+                                .setClick { player.displayPost(post) }
+                        }
+                    }
+            }
+
+            EDIT_POST_SELECTION -> {
+                DB.getMyPosts(player)
+                    .mapIndexedNotNull { index, post ->
+                        middleRowSlots.getOrNull(index)?.let { slot ->
+                            Button(slot, Material.WRITTEN_BOOK, post.title)
+                                .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
+                                    player.getPlayerState().selectedPostId = post.id
+                                    gui.switchState(EDIT_POST)
+                                }
+                        }
+                    }
+            }
+
+            DELETE_POST_SELECTION -> {
+                DB.getMyPosts(player)
+                    .mapIndexedNotNull { index, post ->
+                        middleRowSlots.getOrNull(index)?.let { slot ->
+                            Button(slot, Material.WRITTEN_BOOK, post.title)
+                                .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
+                                    player.getPlayerState().selectedPostId = post.id
+                                    gui.switchState(CONFIRM_DELETE_POST)
+                                }
                         }
                     }
             }
@@ -429,7 +487,7 @@ object GUIManager {
         return Button(13, Material.PAPER, ap.getMessage(GUI.Other.NoPosts))
     }
 
-    private fun getTitle(player: Player): Component {
+    private fun getGUITitle(player: Player): Component {
         val ap = player.adapt()
         val titleAC = mapOf("version" to Plugin.version)
         return ap.getMessage(GUI.Title, titleAC)
