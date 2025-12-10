@@ -75,7 +75,7 @@ class BulletinBoard : JavaPlugin() {
 		initLanguage()
 
         AdapterRegistry.registerAdapter(ShortUUID::class, shortUUIDAdapter)
-        AdapterRegistry.registerAdapter(Component::class, textComponentAdapter)
+		AdapterRegistry.registerAdapter(Component::class, componentAdapter)
 	}
 
 	override fun onEnable() {
@@ -83,6 +83,9 @@ class BulletinBoard : JavaPlugin() {
 		server.pluginManager.registerEvents(GUIRelListener(), this)
 		server.pluginManager.registerEvents(playerListener, this)
 		registerMainCommand()
+
+		// Just Initialize
+		DataBase.posts; DataBase.playerSettings
     }
 
     override fun onDisable() {
@@ -185,7 +188,7 @@ class BulletinBoard : JavaPlugin() {
         }
     }
 
-    private val textComponentAdapter = object : TypeAdapter<Component> {
+	private val componentAdapter = object : TypeAdapter<Component> {
         private val serializer = GsonComponentSerializer.gson()
 
         override fun estimateSize(value: Component): Int {

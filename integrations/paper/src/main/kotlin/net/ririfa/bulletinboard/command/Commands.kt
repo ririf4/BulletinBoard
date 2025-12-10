@@ -48,6 +48,7 @@ enum class Commands(val execute: CommandExecute) {
         if (player.hasPermission("bulletinboard.post.debug")) {
             if (args.size > 1 && (args[1] == "0" || args[1] == "1")) {
                 val isAnonymous = args[1] == "1"
+                val count = args[2].toIntOrNull() ?: 1
 
                 val post = DataBase.Post(
                     id = ShortUUID.generate(),
@@ -59,7 +60,7 @@ enum class Commands(val execute: CommandExecute) {
                     editedOn = Date(),
                     isDeleted = false
                 )
-                DataBase.insertPost(post)
+                repeat(count) { DataBase.insertPost(post) }
                 player.sendMessage("Debug post inserted with isAnonymous set to $isAnonymous")
             } else {
                 player.sendMessage("Usage: /insertdebugpost <0 or 1>")

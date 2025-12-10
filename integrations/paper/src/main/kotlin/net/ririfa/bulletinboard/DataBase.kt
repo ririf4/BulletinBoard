@@ -8,6 +8,7 @@ import dev.swiftstorm.akkaradb.engine.PackedTable
 import dev.swiftstorm.akkaradb.engine.StartupMode
 import dev.swiftstorm.akkaradb.format.akk.parity.RSParityCoder
 import net.kyori.adventure.text.Component
+import net.ririfa.bulletinboard.util.PostDraft
 import net.ririfa.bulletinboard.util.ShortUUID
 import org.bukkit.entity.Player
 import java.util.*
@@ -53,9 +54,18 @@ object DataBase {
 	}
 
     fun getDeletedPost(): List<Post> {
-        return posts.runToList {
-            isDeleted
+        return posts.runToList { isDeleted }
+    }
+
+    fun deletePost(id: ShortUUID) {
+        val post = posts.get(id)
+        post?.copy(isDeleted = true).also {
+            it?.let { entity -> posts.put(entity) }
         }
+    }
+
+    fun deletePermanently(id: ShortUUID) {
+        posts.delete(id)
     }
 
     fun close() {
@@ -85,3 +95,11 @@ object DataBase {
         val settingValue: String
 	)
 }
+
+fun DataBase.Post.toDraft(): PostDraft = PostDraft(
+    id = this.id,
+    title = this.title,
+    content = this.content,
+    isAnonymous = this.isAnonymous,
+    date = this.date
+)

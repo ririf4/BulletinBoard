@@ -31,16 +31,25 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
             }
 
             sealed class Confirmation : Buttons() {
-                object CancelCancelPost : Confirmation()
-                object CancelCancelEdit : Confirmation()
-
+                // Confirm/Cancel "Save Post"
                 object ConfirmSavePost : Confirmation()
-                object ConfirmSaveEdit : Confirmation()
+                object CancelSavePost : Confirmation()
 
+                // Confirm/Cancel "Save Edit"
+                object ConfirmSaveEdit : Confirmation()
+                object CancelSaveEdit : Confirmation()
+
+                // Confirm/Cancel "Cancel Post"
                 object ConfirmCancelPost : Confirmation()
+                object CancelCancelPost : Confirmation()
+
+                // Confirm/Cancel "Cancel Edit"
+                object CancelCancelEdit : Confirmation()
                 object ConfirmCancelEdit : Confirmation()
 
-                object CancelEdit : Confirmation()
+                // Confirm/Cancel "Delete Post"
+                object ConfirmDeletePost : Confirmation()
+                object CancelDeletePost : Confirmation()
             }
 
             sealed class DeletedPosts : Buttons() {
@@ -80,9 +89,13 @@ sealed class BBMessageKey : MessageKey<BBMSGProvider, TextComponent> {
     sealed class Messages : BBMessageKey() {
         object PostSaved : Messages()
         object PostEdited : Messages()
+        object PostDeleted : Messages()
+        object PostRestored : Messages()
+        object PostDeletedPermanently : Messages()
 
         object NotPreviewing : Messages() // プレビュー中ではありません。
         object PostDraftNull : Messages() // 投稿の下書きが存在しません。
+        object SelectedPostNotFound : Messages() // 投稿が選択されていません
 
         object JoinDiscord : Messages() // Discordに参加して、コミュニティとつながりましょう！リンク: %link%
 

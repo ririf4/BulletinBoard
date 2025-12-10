@@ -22,9 +22,17 @@ GUI:
       DeleteOthers: "投稿を削除"
 
     Confirmation:
-      CancelCancelPost: "キャンセルを取り消す"
-      Confirm: "確認"
-      CancelEdit: "編集をキャンセル"
+      ConfirmSavePost: "投稿を保存"
+      CancelSavePost: "投稿の編集を続ける"
+
+      ConfirmSaveEdit: "編集を保存"
+      CancelSaveEdit: "編集をキャンセル"
+
+      ConfirmCancelPost: "投稿をキャンセルしますか？"
+      CancelCancelPost: "投稿を続けます"
+
+      ConfirmDeletePost: "削除"
+      CancelDeletePost: "削除をキャンセル"
 
     DeletedPosts:
       RestorePost: "投稿を復元"
