@@ -28,8 +28,8 @@ GUI:
       ConfirmSaveEdit: "編集を保存"
       CancelSaveEdit: "編集をキャンセル"
 
-      ConfirmCancelPost: "投稿をキャンセルしますか？"
-      CancelCancelPost: "投稿を続けます"
+      ConfirmCancelPost: "投稿をやめる"
+      CancelCancelPost: "編集に戻る"
 
       ConfirmDeletePost: "削除"
       CancelDeletePost: "削除をキャンセル"
@@ -51,7 +51,7 @@ GUI:
     CancelEdit: "編集をキャンセル"
     EditError: "編集エラー"
     EditErrorReason:
-      DraftNull: "投稿の下書きが存在しません。"
+      DraftNull: "投稿の下書きが存在しません、もう一度やり直してみて下さい"
 
   Other:
     NoPosts: "投稿がありません..."

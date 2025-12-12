@@ -155,13 +155,26 @@ object GUIManager {
             }
 
             DELETE_POST_PERMANENTLY_SELECTION -> {
-                DB.getDeletedPost()
+                DB.getDeletedPosts(player)
                     .mapIndexedNotNull { index, post ->
                         middleRowSlots.getOrNull(index)?.let { slot ->
                             Button(slot, Material.WRITTEN_BOOK, post.title)
                                 .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
                                     player.getPlayerState().selectedPostId = post.id
                                     gui.switchState(CONFIRM_DELETE_POST_PERMANENTLY)
+                                }
+                        }
+                    }
+            }
+
+            DELETE_POST_OTHERS_SELECTION -> {
+                DB.getDeletedPosts()
+                    .mapIndexedNotNull { index, post ->
+                        middleRowSlots.getOrNull(index)?.let { slot ->
+                            Button(slot, Material.WRITTEN_BOOK, post.title)
+                                .setClickTyped<PaginatedDynamicGUI<GUIState>> { player, gui ->
+                                    player.getPlayerState().selectedPostId = post.id
+                                    gui.switchState(CONFIRM_DELETE_POST_OTHERS)
                                 }
                         }
                     }

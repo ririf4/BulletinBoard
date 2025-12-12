@@ -81,7 +81,7 @@ enum class GUIState(val provider: (Player) -> List<Button>) {
                 },
 
             // 内容編集
-            Button(15, Material.BOOK, draft.content)
+            Button(15, Material.PAPER, draft.content)
                 .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                     ps.mode = PlayerMode.AWAITING_CONTENT_INPUT
                     gui.close()
@@ -117,7 +117,7 @@ enum class GUIState(val provider: (Player) -> List<Button>) {
                 },
 
             // 内容編集
-            Button(15, Material.BOOK, draft.content)
+            Button(15, Material.PAPER, draft.content)
                 .setClickTyped<PaginatedDynamicGUI<GUIState>> { _, gui ->
                     ps.mode = PlayerMode.AWAITING_EDIT_CONTENT_INPUT
                     gui.close()
@@ -375,6 +375,10 @@ enum class GUIState(val provider: (Player) -> List<Button>) {
 
     CONFIRM_DELETE_POST_PERMANENTLY({ player ->
         val ps = player.getPlayerState()
+        listOf()
+    }),
+
+    CONFIRM_DELETE_POST_OTHERS({ player ->
         listOf()
     })
     ;

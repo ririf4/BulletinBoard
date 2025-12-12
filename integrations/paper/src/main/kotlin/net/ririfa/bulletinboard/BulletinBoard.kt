@@ -74,8 +74,8 @@ class BulletinBoard : JavaPlugin() {
 		instance = this
 		initLanguage()
 
-        AdapterRegistry.registerAdapter(ShortUUID::class, shortUUIDAdapter)
-		AdapterRegistry.registerAdapter(Component::class, componentAdapter)
+		AdapterRegistry.register<ShortUUID>(shortUUIDAdapter)
+		AdapterRegistry.register<Component>(componentAdapter)
 	}
 
 	override fun onEnable() {

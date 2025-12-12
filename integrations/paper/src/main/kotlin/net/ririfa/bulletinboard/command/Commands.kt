@@ -48,7 +48,10 @@ enum class Commands(val execute: CommandExecute) {
         if (player.hasPermission("bulletinboard.post.debug")) {
             if (args.size > 1 && (args[1] == "0" || args[1] == "1")) {
                 val isAnonymous = args[1] == "1"
-                val count = args[2].toIntOrNull() ?: 1
+                var count = 1
+                if (args.size > 2) {
+                    count = args[2].toIntOrNull() ?: 1
+                }
 
                 val post = DataBase.Post(
                     id = ShortUUID.generate(),

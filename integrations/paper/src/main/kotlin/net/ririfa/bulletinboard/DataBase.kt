@@ -53,7 +53,7 @@ object DataBase {
 		}
 	}
 
-    fun getDeletedPost(): List<Post> {
+    fun getDeletedPosts(): List<Post> {
         return posts.runToList { isDeleted }
     }
 

@@ -18,7 +18,7 @@ dependencies {
     paperLibrary(libs.langman.core)
     paperLibrary(libs.langman.ext.yaml)
 
-	akkara("0.2.9", "paperLibrary")
+	akkara("0.2.10", "paperLibrary")
 }
 
 paper {
